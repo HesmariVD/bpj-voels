@@ -562,7 +562,8 @@ input:focus,select:focus{border-color:var(--g400);}
 <div id="toast" class="toast"></div>
 </div><!-- end app-root -->
 
-<script defer>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
 const SUPA_URL = 'https://nnerqwjzledbthytqcze.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5uZXJxd2p6bGVkYnRoeXRxY3plIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNjA3NDEsImV4cCI6MjEwMzkzNjc0MX0.yu8PUkMBHzjpfxDPQoB662swXswY243Sf7Artx4x1r0';
 let supabase;
@@ -1786,6 +1787,7 @@ function importData(event) {
     }
   });
 })();
+}); // end DOMContentLoaded
 </script>
 </body>
 </html>

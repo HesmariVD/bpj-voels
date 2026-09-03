@@ -1,0 +1,1797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BPJ Voëls</title>
+<script>
+// Will be set after Supabase loads
+window._supabaseReady = false;
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" 
+  onload="window._supabaseReady=true;"
+  onerror="document.getElementById('cdn-error').style.display='block';"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g50:#f0faf0;--g100:#d4f1d4;--g200:#a8e0a8;--g300:#72c472;--g400:#4aaa4a;
+  --g500:#2e8b2e;--g600:#1f6b1f;--g700:#155015;--g800:#0d360d;--g900:#071f07;
+  --bg:#f5faf3;--card:#ffffff;--border:#c8e6c8;--text:#1a2e1a;--muted:#5a7a5a;
+  --danger:#c0392b;--dangerL:#fdf2f2;
+  --male:#1a6fa8;--maleL:#e6f2fa;--female:#a8336e;--femaleL:#faeaf3;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;
+  background-image:radial-gradient(ellipse at 10% 20%,rgba(126,186,126,.12) 0%,transparent 50%),
+  radial-gradient(ellipse at 90% 80%,rgba(46,139,46,.08) 0%,transparent 50%);}
+.leaf-bg{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden;}
+.leaf-bg svg{position:absolute;opacity:.055;}
+header{background:linear-gradient(135deg,var(--g700) 0%,var(--g500) 60%,var(--g400) 100%);
+  color:white;padding:1.4rem 2rem 0;position:relative;overflow:hidden;box-shadow:0 4px 20px rgba(21,80,21,.3);}
+header::before{content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200' viewBox='0 0 400 200'%3E%3Cpath d='M0,100 Q50,20 100,80 Q150,140 200,60 Q250,-20 300,80 Q350,180 400,100' fill='none' stroke='rgba(255,255,255,0.07)' stroke-width='40'/%3E%3C/svg%3E") repeat-x bottom;pointer-events:none;}
+.header-inner{display:flex;align-items:center;gap:1rem;position:relative;z-index:1;}
+.logo-icon{font-size:2.4rem;filter:drop-shadow(0 2px 4px rgba(0,0,0,.2));}
+.app-title{font-family:'Playfair Display',serif;font-size:2rem;font-weight:600;letter-spacing:-.02em;}
+.app-sub{font-size:.75rem;opacity:.75;letter-spacing:.1em;text-transform:uppercase;margin-top:1px;}
+.tabs{display:flex;position:relative;z-index:1;margin-top:1.2rem;flex-wrap:wrap;}
+.tab{padding:.7rem 1.4rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:500;
+  color:rgba(255,255,255,.7);border-radius:10px 10px 0 0;transition:all .2s;border:none;background:none;
+  display:flex;align-items:center;gap:.35rem;user-select:none;}
+.tab:hover{color:white;background:rgba(255,255,255,.1);}
+.tab.active{background:var(--bg);color:var(--g700);font-weight:600;}
+main{position:relative;z-index:1;padding:1.8rem 2rem;max-width:1300px;margin:0 auto;}
+.section{display:none;}.section.active{display:block;}
+/* FORMS */
+.fg{display:flex;flex-direction:column;gap:.35rem;min-width:120px;}
+.fg label{font-size:.7rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+input,select{padding:.5rem .75rem;border:1.5px solid var(--border);border-radius:8px;
+  font-family:'DM Sans',sans-serif;font-size:.86rem;color:var(--text);background:var(--bg);
+  outline:none;transition:border-color .2s;width:100%;}
+input:focus,select:focus{border-color:var(--g400);}
+.btn{padding:.55rem 1.3rem;border-radius:8px;border:none;cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-size:.86rem;font-weight:500;transition:all .15s;
+  display:inline-flex;align-items:center;gap:.35rem;}
+.btn-p{background:var(--g500);color:white;}.btn-p:hover{background:var(--g600);transform:translateY(-1px);}
+.btn-d{background:var(--dangerL);color:var(--danger);border:1px solid #f5c6c6;}.btn-d:hover{background:#fce8e8;}
+.btn-s{background:white;color:var(--g600);border:1.5px solid var(--g300);}.btn-s:hover{background:var(--g50);}
+.btn-sm{padding:.28rem .7rem;font-size:.76rem;}
+.btn-gold{background:#c9a84c;color:white;border:none;}.btn-gold:hover{background:#b8943e;}
+/* CAGE */
+.cage-ctrl{background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:1.3rem 1.5rem;margin-bottom:1.4rem;display:flex;flex-wrap:wrap;gap:1rem;align-items:flex-end;}
+.sec-title{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:500;
+  color:var(--g700);margin-bottom:.9rem;display:flex;align-items:center;gap:.5rem;}
+.cages-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.1rem;}
+.cage-card{background:var(--card);border:1.5px solid var(--border);border-radius:13px;
+  overflow:hidden;box-shadow:0 2px 8px rgba(21,80,21,.06);transition:box-shadow .2s,transform .2s;}
+.cage-card:hover{box-shadow:0 6px 20px rgba(21,80,21,.12);transform:translateY(-2px);}
+.cage-hd{background:linear-gradient(135deg,var(--g600),var(--g500));color:white;
+  padding:.85rem 1.1rem;display:flex;align-items:center;justify-content:space-between;}
+.cage-hd-l{display:flex;align-items:center;gap:.55rem;}
+.cage-hd-edit{display:none;flex:1;align-items:center;gap:.4rem;}
+.btn-icon-edit{background:none;border:none;cursor:pointer;font-size:.9rem;opacity:.7;padding:0;line-height:1;transition:opacity .15s;}
+.btn-icon-edit:hover{opacity:1;}
+.cage-nm{font-weight:600;font-size:.97rem;}
+.cage-cnt{font-size:.71rem;opacity:.85;background:rgba(255,255,255,.2);padding:2px 8px;border-radius:18px;}
+.cage-body{padding:.9rem 1.1rem;}
+.bird-list{display:flex;flex-direction:column;gap:.45rem;margin-bottom:.7rem;}
+.bird-item{display:flex;align-items:center;justify-content:space-between;
+  border-radius:8px;padding:.42rem .65rem;border:1px solid;}
+.bird-item.male{background:var(--maleL);border-color:#b3d4ed;}
+.bird-item.female{background:var(--femaleL);border-color:#e8b3d0;}
+.bird-item.unknown{background:var(--g50);border-color:var(--g100);}
+.bird-info{display:flex;flex-direction:column;}
+.bird-type{font-size:.83rem;font-weight:500;}
+.bird-item.male .bird-type{color:var(--male);}
+.bird-item.female .bird-type{color:var(--female);}
+.bird-item.unknown .bird-type{color:var(--g700);}
+.bird-meta{font-size:.71rem;color:var(--muted);}
+.no-birds{color:var(--muted);font-size:.83rem;font-style:italic;margin-bottom:.7rem;}
+.cage-ft{border-top:1px solid var(--border);padding:.65rem 1.1rem;display:flex;gap:.45rem;}
+.empty-st{text-align:center;padding:3.5rem 2rem;color:var(--muted);}
+.empty-st .big-i{font-size:3.5rem;margin-bottom:.8rem;}
+.empty-st h3{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--g600);margin-bottom:.4rem;}
+/* SPECIES */
+.sp-mgr{background:var(--card);border:1.5px solid #c9a84c;border-radius:13px;overflow:hidden;margin-bottom:1.4rem;}
+.sp-hd{background:linear-gradient(135deg,#8B6914,#c9a84c);color:white;padding:.85rem 1.2rem;
+  font-family:'Playfair Display',serif;font-size:.97rem;font-weight:500;
+  display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+.sp-body{padding:1.1rem;display:none;}.sp-body.open{display:block;}
+.sp-tags{display:flex;flex-wrap:wrap;gap:.45rem;margin-bottom:.9rem;}
+.sp-tag{display:flex;align-items:center;gap:.35rem;background:var(--g50);
+  border:1px solid var(--g200);border-radius:18px;padding:.28rem .75rem;font-size:.8rem;color:var(--g700);}
+.sp-tag button{background:none;border:none;cursor:pointer;color:var(--danger);font-size:.82rem;line-height:1;padding:0 1px;}
+.sp-add{display:flex;gap:.55rem;align-items:center;}.sp-add input{flex:1;}
+/* SUMMARY PANEL */
+.sum-panel{background:var(--card);border:1.5px solid var(--border);border-radius:13px;overflow:hidden;margin-bottom:1.4rem;}
+.sum-ph{background:linear-gradient(135deg,var(--g800),var(--g700));color:white;padding:.85rem 1.2rem;
+  font-family:'Playfair Display',serif;font-size:.97rem;font-weight:500;display:flex;align-items:center;gap:.45rem;}
+.sum-pb{padding:1.1rem;}
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.75rem;margin-bottom:1.1rem;}
+.stat-box{background:var(--g50);border:1px solid var(--g100);border-radius:9px;padding:.75rem;text-align:center;}
+.stat-box .sv{font-size:1.65rem;font-weight:600;color:var(--g700);}
+.stat-box .sl{font-size:.68rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+.sp-brkdn{display:flex;flex-direction:column;gap:.38rem;}
+.sp-row{display:flex;align-items:center;justify-content:space-between;
+  padding:.42rem .65rem;background:var(--bg);border:1px solid var(--border);border-radius:7px;font-size:.83rem;}
+.sp-nm{font-weight:500;color:var(--g700);}
+.sp-ct{background:var(--g500);color:white;border-radius:11px;padding:1px 9px;font-size:.72rem;font-weight:600;}
+/* FINANCE */
+.fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;}
+@media(max-width:800px){.fin-grid{grid-template-columns:1fr;}}
+.fin-card{background:var(--card);border:1.5px solid var(--border);border-radius:13px;overflow:hidden;}
+.fin-hd{background:linear-gradient(135deg,var(--g700),var(--g600));color:white;padding:.85rem 1.2rem;
+  font-family:'Playfair Display',serif;font-size:.97rem;font-weight:500;display:flex;align-items:center;gap:.45rem;}
+.fin-body{padding:1.1rem;}
+.ef{display:flex;flex-direction:column;gap:.65rem;margin-bottom:.9rem;}
+.ef .fr{display:flex;flex-wrap:wrap;gap:.55rem;}.ef .fr .fg{flex:1;min-width:95px;}
+.ef select,.ef input{font-size:.82rem;}
+.t-list{max-height:250px;overflow-y:auto;display:flex;flex-direction:column;gap:.38rem;}
+.t-item{display:flex;align-items:center;justify-content:space-between;
+  padding:.55rem .75rem;border-radius:7px;border:1px solid var(--border);background:var(--bg);font-size:.82rem;}
+.t-item.income{border-left:3px solid var(--g400);}.t-item.expense{border-left:3px solid #e07070;}
+.t-l{display:flex;flex-direction:column;}.t-desc{font-weight:500;}.t-sub{font-size:.7rem;color:var(--muted);}
+.t-amt{font-weight:600;font-size:.9rem;}.t-amt.pos{color:var(--g600);}.t-amt.neg{color:var(--danger);}
+.sum-full{background:var(--card);border:1.5px solid var(--border);border-radius:13px;overflow:hidden;margin-top:1.4rem;}
+.sum-hd{background:linear-gradient(135deg,var(--g800),var(--g700));color:white;padding:.95rem 1.4rem;
+  font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:500;
+  display:flex;align-items:center;justify-content:space-between;}
+.sum-body{padding:1.4rem;}
+.m-table{width:100%;border-collapse:collapse;font-size:.84rem;}
+.m-table th{background:var(--g50);color:var(--g700);text-align:left;padding:.55rem .75rem;
+  font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid var(--border);}
+.m-table td{padding:.5rem .75rem;border-bottom:1px solid var(--border);}
+.m-table tr:last-child td{border-bottom:none;}.m-table tr:hover td{background:var(--g50);}
+.profit{color:var(--g600);font-weight:600;}.loss{color:var(--danger);font-weight:600;}
+.tot-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem;margin-top:1.1rem;}
+.tot-card{border-radius:9px;padding:.9rem;text-align:center;}
+.tot-card.inc{background:#e8f8e8;border:1px solid var(--g200);}
+.tot-card.exp{background:#fdf0f0;border:1px solid #f5c6c6;}
+.tot-card.net{background:var(--g50);border:1.5px solid var(--g300);}
+.tot-lbl{font-size:.7rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.25rem;}
+.tot-amt{font-size:1.45rem;font-weight:600;}
+.tot-amt.gn{color:var(--g600);}.tot-amt.rd{color:var(--danger);}
+.tot-amt.np{color:var(--g600);}.tot-amt.nn{color:var(--danger);}
+/* MODAL */
+.mo{display:none;position:fixed;inset:0;background:rgba(10,30,10,.52);z-index:1000;
+  align-items:center;justify-content:center;}
+.mo.open{display:flex;}
+.modal{background:white;border-radius:15px;padding:1.8rem;width:95%;max-width:500px;
+  box-shadow:0 20px 60px rgba(0,0,0,.25);animation:slideUp .2s ease;max-height:92vh;overflow-y:auto;}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}
+.modal h3{font-family:'Playfair Display',serif;font-size:1.15rem;margin-bottom:1.1rem;color:var(--g700);}
+.modal .fg{margin-bottom:.85rem;}
+.modal-acts{display:flex;gap:.65rem;justify-content:flex-end;margin-top:1.1rem;}
+.parents-section{background:var(--g50);border:1px solid var(--g100);border-radius:10px;
+  padding:.85rem;margin-bottom:.85rem;}
+.parents-section .ps-title{font-size:.75rem;font-weight:500;color:var(--g600);
+  text-transform:uppercase;letter-spacing:.06em;margin-bottom:.65rem;}
+.parents-row{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;}
+/* TOAST */
+.toast{position:fixed;bottom:1.8rem;right:1.8rem;background:var(--g700);color:white;
+  padding:.65rem 1.1rem;border-radius:9px;font-size:.86rem;z-index:9999;
+  opacity:0;transform:translateY(10px);transition:all .25s;box-shadow:0 4px 12px rgba(0,0,0,.2);}
+.toast.show{opacity:1;transform:none;}
+/* FAMILY TREE TAB */
+.ft-layout{display:grid;grid-template-columns:280px 1fr;gap:1.4rem;align-items:start;}
+@media(max-width:900px){.ft-layout{grid-template-columns:1fr;}}
+.ft-sidebar{background:var(--card);border:1.5px solid var(--border);border-radius:13px;overflow:hidden;}
+.ft-sidebar-hd{background:linear-gradient(135deg,var(--g700),var(--g500));color:white;
+  padding:.85rem 1.1rem;font-family:'Playfair Display',serif;font-size:.97rem;font-weight:500;}
+.ft-sidebar-body{padding:.9rem;}
+.bird-select-item{display:flex;align-items:center;gap:.5rem;padding:.5rem .65rem;
+  border-radius:8px;cursor:pointer;border:1.5px solid transparent;transition:all .15s;margin-bottom:.3rem;}
+.bird-select-item:hover{background:var(--g50);border-color:var(--g200);}
+.bird-select-item.selected{background:var(--g100);border-color:var(--g400);}
+.bsi-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.bsi-dot.male{background:var(--male);}.bsi-dot.female{background:var(--female);}.bsi-dot.unknown{background:var(--muted);}
+.bsi-info{display:flex;flex-direction:column;}
+.bsi-name{font-size:.84rem;font-weight:500;color:var(--text);}
+.bsi-sub{font-size:.7rem;color:var(--muted);}
+.ft-canvas-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:13px;
+  overflow:auto;min-height:420px;position:relative;}
+.ft-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:420px;color:var(--muted);text-align:center;padding:2rem;}
+.ft-empty .big-i{font-size:3rem;margin-bottom:.7rem;}
+/* TREE SVG NODES */
+.tree-node-box{rx:8;}
+.tree-conn{fill:none;stroke:#a8c8a8;stroke-width:1.5;}
+/* SOLD BIRD STYLES */
+.sold-bird { opacity: .8; }
+.bsi-dot.sold { background: #e53e3e; }
+.bsi-sold { text-decoration: line-through; color: #888; }
+.bird-select-item.sold-bird .bsi-sub { color: #e53e3e; }
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--g200);border-radius:10px;}
+</style>
+</head>
+<body>
+<!-- LOGIN SCREEN -->
+<div id="login-screen" style="display:flex;position:fixed;inset:0;z-index:9999;
+  background:linear-gradient(135deg,#0d360d 0%,#155015 50%,#2e8b2e 100%);
+  align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;">
+  <div style="background:white;border-radius:20px;padding:2.5rem 2rem;width:95%;max-width:380px;
+    box-shadow:0 30px 80px rgba(0,0,0,.35);text-align:center;">
+    <div style="font-size:3rem;margin-bottom:.5rem;">🦜</div>
+    <div style="font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:600;color:#155015;margin-bottom:.2rem;">BPJ Voëls</div>
+    <div style="font-size:.75rem;color:#5a7a5a;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1.8rem;">Bird Breeding Manager</div>
+    <div id="cdn-error" style="display:none;background:#fdf2f2;border:1px solid #f5c6c6;color:#c0392b;
+      border-radius:8px;padding:.7rem .9rem;font-size:.82rem;margin-bottom:1rem;text-align:left;">
+      ⚠️ <strong>App failed to load.</strong> Make sure you are connected to the internet and the black server window is open, then refresh the page (press F5).
+    </div>
+    <div id="js-error" style="display:none;background:#fdf2f2;border:1px solid #f5c6c6;color:#c0392b;
+      border-radius:8px;padding:.7rem .9rem;font-size:.82rem;margin-bottom:1rem;text-align:left;"></div>
+    <div id="login-error" style="display:none;background:#fdf2f2;border:1px solid #f5c6c6;color:#c0392b;
+      border-radius:8px;padding:.6rem .9rem;font-size:.82rem;margin-bottom:1rem;text-align:left;"></div>
+    <div id="login-msg" style="display:none;background:#f0faf0;border:1px solid #a8e0a8;color:#155015;
+      border-radius:8px;padding:.6rem .9rem;font-size:.82rem;margin-bottom:1rem;text-align:left;"></div>
+    <div style="text-align:left;margin-bottom:.8rem;">
+      <label style="font-size:.72rem;font-weight:600;color:#5a7a5a;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:.3rem;">Email</label>
+      <input type="email" id="login-email" placeholder="your@email.com"
+        style="width:100%;padding:.6rem .85rem;border:1.5px solid #c8e6c8;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.92rem;outline:none;"
+        onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div style="text-align:left;margin-bottom:1.3rem;">
+      <label style="font-size:.72rem;font-weight:600;color:#5a7a5a;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:.3rem;">Password</label>
+      <input type="password" id="login-password" placeholder="••••••••"
+        style="width:100%;padding:.6rem .85rem;border:1.5px solid #c8e6c8;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.92rem;outline:none;"
+        onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button onclick="doLogin()" id="login-btn"
+      style="width:100%;padding:.75rem;background:linear-gradient(135deg,#155015,#2e8b2e);color:white;border:none;
+        border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;margin-bottom:.8rem;">
+      🔑 Sign In
+    </button>
+    <button onclick="doSignup()" id="signup-btn"
+      style="width:100%;padding:.65rem;background:white;color:#155015;border:1.5px solid #a8e0a8;
+        border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:500;cursor:pointer;margin-bottom:1rem;">
+      ✉️ Create Account
+    </button>
+    <div style="font-size:.73rem;color:#5a7a5a;">
+      <span onclick="doReset()" style="cursor:pointer;text-decoration:underline;">Forgot password?</span>
+    </div>
+    <div id="file-warning" style="display:none;margin-top:1rem;background:#fff8e1;border:1px solid #ffe082;
+      border-radius:8px;padding:.7rem .9rem;font-size:.78rem;color:#5d4037;text-align:left;line-height:1.5;">
+      ⚠️ <strong>Running as a local file.</strong> For the login to work, you need to open this app through a small local server.<br><br>
+      <strong>Windows:</strong> Double-click <code>start.bat</code><br>
+      <strong>Mac/Linux:</strong> Double-click or run <code>start.sh</code><br><br>
+      Then open <strong>http://localhost:8080</strong> in your browser.
+    </div>
+  </div>
+</div>
+
+<!-- APP (hidden until logged in) -->
+<div id="app-root" style="display:none;">
+<div class="leaf-bg">
+  <svg style="top:-60px;left:-80px;width:300px;height:300px;" viewBox="0 0 200 200">
+    <path d="M100,10 Q160,10 180,70 Q200,130 140,160 Q80,190 40,150 Q0,110 20,60 Q40,10 100,10Z" fill="#2e8b2e"/>
+    <path d="M100,10 Q100,10 100,160" stroke="#1f6b1f" stroke-width="3" fill="none"/>
+  </svg>
+  <svg style="top:10px;right:-40px;width:240px;height:240px;" viewBox="0 0 200 200">
+    <path d="M30,100 Q30,20 100,10 Q170,0 180,70 Q190,140 130,170 Q70,200 30,100Z" fill="#4aaa4a"/>
+  </svg>
+  <svg style="bottom:40px;left:20px;width:160px;height:160px;" viewBox="0 0 200 200">
+    <path d="M80,190 Q10,150 10,90 Q10,30 80,20 Q140,10 170,60 Q200,110 150,160 Q100,190 80,190Z" fill="#72c472"/>
+  </svg>
+  <svg style="bottom:0;right:80px;width:200px;height:150px;" viewBox="0 0 200 200">
+    <ellipse cx="100" cy="100" rx="80" ry="50" fill="#2e8b2e" transform="rotate(-30 100 100)"/>
+  </svg>
+</div>
+
+<header>
+  <div class="header-inner">
+    <div class="logo-icon">🦜</div>
+    <div>
+      <div class="app-title">BPJ Voëls</div>
+      <div class="app-sub">Bird Breeding Manager</div>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:.5rem;align-items:center;position:relative;z-index:2;flex-wrap:wrap;">
+      <span id="header-user" style="font-size:.72rem;opacity:.8;color:white;"></span>
+      <button onclick="exportData()" title="Export all data to a file"
+        style="background:rgba(255,255,255,.18);color:white;border:1.5px solid rgba(255,255,255,.4);
+               border-radius:8px;padding:.4rem .85rem;font-size:.78rem;font-weight:600;cursor:pointer;
+               display:flex;align-items:center;gap:.35rem;font-family:'DM Sans',sans-serif;transition:background .15s;"
+        onmouseover="this.style.background='rgba(255,255,255,.28)'" onmouseout="this.style.background='rgba(255,255,255,.18)'">
+        ⬇️ Export
+      </button>
+      <button onclick="document.getElementById('import-file-input').click()" title="Import data from a file"
+        style="background:rgba(255,255,255,.18);color:white;border:1.5px solid rgba(255,255,255,.4);
+               border-radius:8px;padding:.4rem .85rem;font-size:.78rem;font-weight:600;cursor:pointer;
+               display:flex;align-items:center;gap:.35rem;font-family:'DM Sans',sans-serif;transition:background .15s;"
+        onmouseover="this.style.background='rgba(255,255,255,.28)'" onmouseout="this.style.background='rgba(255,255,255,.18)'">
+        ⬆️ Import
+      </button>
+      <button onclick="doLogout()" title="Sign out"
+        style="background:rgba(255,255,255,.18);color:white;border:1.5px solid rgba(255,255,255,.4);
+               border-radius:8px;padding:.4rem .85rem;font-size:.78rem;font-weight:600;cursor:pointer;
+               display:flex;align-items:center;gap:.35rem;font-family:'DM Sans',sans-serif;transition:background .15s;"
+        onmouseover="this.style.background='rgba(255,255,255,.28)'" onmouseout="this.style.background='rgba(255,255,255,.18)'">
+        🚪 Sign Out
+      </button>
+      <input type="file" id="import-file-input" accept=".json" style="display:none;" onchange="importData(event)">
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('cages',this)">🏠 Cages &amp; Birds</button>
+    <button class="tab" onclick="switchTab('family',this)">🌳 Family Trees</button>
+    <button class="tab" onclick="switchTab('finance',this)">💰 Finance</button>
+  </div>
+</header>
+
+<main>
+
+<!-- ===== CAGES TAB ===== -->
+<section class="section active" id="section-cages">
+  <div class="sp-mgr">
+    <div class="sp-hd" onclick="toggleSpecies()">
+      <span>🐦 Manage Bird Species</span>
+      <span id="sp-arrow" style="font-size:.95rem;">▼ expand to edit</span>
+    </div>
+    <div class="sp-body" id="sp-body">
+      <p style="font-size:.8rem;color:var(--muted);margin-bottom:.75rem;">Add or remove species from the dropdown used when entering birds.</p>
+      <div class="sp-tags" id="sp-tags"></div>
+      <div class="sp-add">
+        <input type="text" id="new-sp-inp" placeholder="New species name..." onkeydown="if(event.key==='Enter')addSpecies()">
+        <button class="btn btn-gold btn-sm" onclick="addSpecies()">+ Add</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sum-panel">
+    <div class="sum-ph">📊 Aviary Summary</div>
+    <div class="sum-pb">
+      <div class="stat-row">
+        <div class="stat-box"><div class="sv" id="st-cages">0</div><div class="sl">Cages</div></div>
+        <div class="stat-box"><div class="sv" id="st-birds">0</div><div class="sl">Birds</div></div>
+        <div class="stat-box"><div class="sv" id="st-males">0</div><div class="sl">Males ♂</div></div>
+        <div class="stat-box"><div class="sv" id="st-females">0</div><div class="sl">Females ♀</div></div>
+        <div class="stat-box"><div class="sv" id="st-sp">0</div><div class="sl">Species</div></div>
+      </div>
+      <div style="font-size:.7rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.55rem;">Birds by Species</div>
+      <div class="sp-brkdn" id="sp-brkdn"><p style="color:var(--muted);font-size:.82rem;font-style:italic;">No birds yet</p></div>
+    </div>
+  </div>
+
+  <div class="cage-ctrl">
+    <div class="fg" style="flex:1;min-width:170px;">
+      <label>Cage Number / Name</label>
+      <input type="text" id="new-cage-nm" placeholder="e.g. Cage 1, Aviary A...">
+    </div>
+    <button class="btn btn-p" onclick="addCage()">🏠 Add Cage</button>
+  </div>
+  <div class="sec-title">🐦 Your Cages</div>
+  <div class="cages-grid" id="cages-grid"></div>
+</section>
+
+<!-- ===== FAMILY TREE TAB ===== -->
+<section class="section" id="section-family">
+  <div style="margin-bottom:1.2rem;">
+    <div class="sec-title">🌳 Family Trees</div>
+    <p style="font-size:.85rem;color:var(--muted);margin-top:-.4rem;">Select a bird on the left to view its family tree — parents, grandparents and offspring.</p>
+  </div>
+  <div class="ft-layout">
+    <div class="ft-sidebar">
+      <div class="ft-sidebar-hd">All Birds</div>
+      <div class="ft-sidebar-body" id="ft-bird-list">
+        <p style="color:var(--muted);font-size:.82rem;font-style:italic;">No birds yet</p>
+      </div>
+    </div>
+    <div class="ft-canvas-wrap" id="ft-canvas-wrap">
+      <div class="ft-empty" id="ft-empty">
+        <div class="big-i">🌳</div>
+        <p style="font-weight:500;color:var(--g600);margin-bottom:.3rem;">Select a bird</p>
+        <p style="font-size:.82rem;">Click a bird on the left to view its family tree</p>
+      </div>
+      <svg id="ft-svg" style="display:none;min-width:700px;" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FINANCE TAB ===== -->
+<section class="section" id="section-finance">
+  <div class="fin-grid">
+    <div class="fin-card">
+      <div class="fin-hd">🌿 Income (Bird Sales)</div>
+      <div class="fin-body">
+        <div class="ef">
+          <!-- Toggle -->
+          <div style="display:flex;background:var(--g50);border:1px solid var(--g200);border-radius:8px;padding:3px;gap:3px;margin-bottom:.2rem;">
+            <button id="inc-toggle-existing" onclick="setIncomeMode('existing')"
+              style="flex:1;padding:.35rem;border:none;border-radius:6px;font-size:.78rem;font-weight:600;cursor:pointer;background:var(--g500);color:white;transition:all .15s;">
+              📋 Registered Bird
+            </button>
+            <button id="inc-toggle-quick" onclick="setIncomeMode('quick')"
+              style="flex:1;padding:.35rem;border:none;border-radius:6px;font-size:.78rem;font-weight:600;cursor:pointer;background:transparent;color:var(--g600);transition:all .15s;">
+              🐣 Quick Sale (chick / unregistered)
+            </button>
+          </div>
+
+          <!-- Existing bird fields -->
+          <div id="inc-existing-fields">
+            <div class="fr">
+              <div class="fg" style="flex:2;">
+                <label>Bird Sold <span style="font-weight:400;text-transform:none;font-size:.7rem;color:var(--g500);">— automatically removed from cage</span></label>
+                <select id="inc-bird-id" onchange="onIncomeBirdChange()"><option value="">— select bird to sell —</option></select>
+              </div>
+            </div>
+            <div id="inc-bird-info" style="display:none;background:var(--g50);border:1px solid var(--g100);border-radius:8px;padding:.6rem .8rem;font-size:.82rem;color:var(--g700);"></div>
+          </div>
+
+          <!-- Quick sale fields -->
+          <div id="inc-quick-fields" style="display:none;">
+            <div class="fr">
+              <div class="fg"><label>Species</label><select id="inc-quick-sp"><option value="">— select —</option></select></div>
+              <div class="fg"><label>Description (optional)</label><input type="text" id="inc-quick-desc" placeholder="e.g. Baby Sun Conure"></div>
+            </div>
+          </div>
+
+          <div class="fr">
+            <div class="fg"><label>Amount (R)</label><input type="number" id="inc-amt" placeholder="0.00" min="0" step="0.01"></div>
+          </div>
+          <div class="fr">
+            <div class="fg"><label>Month</label><select id="inc-month">
+              <option>January</option><option>February</option><option>March</option><option>April</option>
+              <option>May</option><option>June</option><option>July</option><option>August</option>
+              <option>September</option><option>October</option><option>November</option><option>December</option>
+            </select></div>
+            <div class="fg"><label>Year</label><input type="number" id="inc-yr" value="2025" min="2000" max="2100"></div>
+          </div>
+          <button class="btn btn-p" id="inc-submit-btn" style="width:100%;" onclick="addIncome()">💰 Record Sale &amp; Remove Bird</button>
+        </div>
+        <div class="t-list" id="income-list"></div>
+      </div>
+    </div>
+    <div class="fin-card">
+      <div class="fin-hd">🌱 Expenses</div>
+      <div class="fin-body">
+        <div class="ef">
+          <div class="fr">
+            <div class="fg"><label>Category</label>
+              <select id="exp-cat" onchange="onExpCatChange()">
+                <option>Bird Purchase</option><option>Food</option><option>Cage Upgrade</option>
+                <option>Maintenance</option><option>Vet Bills</option><option>Other</option>
+              </select>
+            </div>
+            <div class="fg"><label>Description</label><input type="text" id="exp-desc" placeholder="Details..."></div>
+          </div>
+          <!-- Bird Purchase extra fields -->
+          <div id="exp-bird-purchase-fields" style="background:var(--g50);border:1px solid var(--g100);border-radius:8px;padding:.7rem;display:flex;flex-direction:column;gap:.55rem;">
+            <div style="font-size:.7rem;font-weight:500;color:var(--g600);text-transform:uppercase;letter-spacing:.06em;">🐦 Bird Details — auto-added to cage</div>
+            <div class="fr">
+              <div class="fg"><label>Species</label><select id="exp-sp" onchange="onExpSpChange()"><option value="">— select —</option></select></div>
+              <div class="fg"><label>Ring Number</label><input type="text" id="exp-ring" placeholder="Ring #"></div>
+            </div>
+            <div class="fr">
+              <div class="fg"><label>Age</label><input type="text" id="exp-age" placeholder="e.g. 2 years"></div>
+              <div class="fg"><label>Sex</label>
+                <select id="exp-sex">
+                  <option value="Unknown">Unknown</option>
+                  <option value="Male">Male ♂</option>
+                  <option value="Female">Female ♀</option>
+                </select>
+              </div>
+            </div>
+            <div class="fr">
+              <div class="fg" style="flex:2;"><label>Add to Cage</label>
+                <select id="exp-cage-id"><option value="">— select cage —</option></select>
+              </div>
+            </div>
+          </div>
+          <!-- Non-bird-purchase fields -->
+          <div id="exp-other-fields" style="display:none;">
+            <div class="fr">
+              <div class="fg"><label>Bird Species (optional)</label><select id="exp-sp-other"><option value="">— optional —</option></select></div>
+              <div class="fg"><label>Cage / Ring #</label><input type="text" id="exp-ref" placeholder="Reference"></div>
+            </div>
+          </div>
+          <div class="fr">
+            <div class="fg"><label>Amount (R)</label><input type="number" id="exp-amt" placeholder="0.00" min="0" step="0.01"></div>
+            <div class="fg"><label>Month</label><select id="exp-month">
+              <option>January</option><option>February</option><option>March</option><option>April</option>
+              <option>May</option><option>June</option><option>July</option><option>August</option>
+              <option>September</option><option>October</option><option>November</option><option>December</option>
+            </select></div>
+          </div>
+          <div class="fr">
+            <div class="fg" style="flex:2;"><label>Year</label><input type="number" id="exp-yr" value="2025" min="2000" max="2100"></div>
+          </div>
+          <button class="btn btn-p" style="width:100%;background:#c0392b;" onclick="addExpense()">🛒 Record Purchase &amp; Add Bird</button>
+        </div>
+        <div class="t-list" id="expense-list"></div>
+      </div>
+    </div>
+  </div>
+  <div class="sum-full">
+    <div class="sum-hd">
+      <span>📊 Profit / Loss Summary</span>
+      <select id="filter-yr" onchange="renderSummary()" style="background:white;color:#1a2e1a;border:1px solid rgba(255,255,255,.5);font-size:.8rem;padding:.28rem .55rem;border-radius:6px;">
+        <option value="all">All Years</option>
+      </select>
+    </div>
+    <div class="sum-body">
+      <table class="m-table">
+        <thead><tr><th>Month</th><th>Year</th><th>Income</th><th>Expenses</th><th>Net Profit / Loss</th></tr></thead>
+        <tbody id="sum-tbody"></tbody>
+      </table>
+      <div class="tot-row">
+        <div class="tot-card inc"><div class="tot-lbl">Total Income</div><div class="tot-amt gn" id="g-inc">R 0.00</div></div>
+        <div class="tot-card exp"><div class="tot-lbl">Total Expenses</div><div class="tot-amt rd" id="g-exp">R 0.00</div></div>
+        <div class="tot-card net"><div class="tot-lbl">Overall P&amp;L</div><div class="tot-amt np" id="g-net">R 0.00</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- MODAL: Add Bird -->
+<div class="mo" id="add-bird-mo">
+  <div class="modal">
+    <h3 id="mo-title">🐦 Add Bird to Cage</h3>
+    <input type="hidden" id="mo-cage-id">
+    <input type="hidden" id="mo-bird-id" value="">
+    <div class="fg"><label>Species</label><select id="mo-sp" onchange="onModalSpChange()"></select></div>
+    <div id="mo-custom-wrap" style="display:none;" class="fg">
+      <label>Custom Species Name</label>
+      <input type="text" id="mo-custom" placeholder="Type species name...">
+    </div>
+    <div class="fg"><label>Ring Number</label><input type="text" id="mo-ring" placeholder="e.g. ZA2024-001"></div>
+    <div class="fg"><label>Age</label><input type="text" id="mo-age" placeholder="e.g. 2 years, 6 months..."></div>
+    <div class="fg"><label>Sex</label>
+      <select id="mo-sex">
+        <option value="Unknown">Unknown</option>
+        <option value="Male">Male ♂</option>
+        <option value="Female">Female ♀</option>
+      </select>
+    </div>
+    <div class="parents-section">
+      <div class="ps-title">🌳 Parentage (Optional)</div>
+      <div class="parents-row">
+        <div class="fg"><label>Father ♂</label><select id="mo-father"><option value="">— none / unknown —</option></select></div>
+        <div class="fg"><label>Mother ♀</label><select id="mo-mother"><option value="">— none / unknown —</option></select></div>
+      </div>
+    </div>
+    <div class="modal-acts">
+      <button class="btn btn-s" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-p" onclick="saveBird()">Add Bird</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+</div><!-- end app-root -->
+
+<script>
+/* ---- SUPABASE SETUP ---- */
+const SUPA_URL = 'https://nnerqwjzledbthytqcze.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5uZXJxd2p6bGVkYnRoeXRxY3plIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNjA3NDEsImV4cCI6MjEwMzkzNjc0MX0.yu8PUkMBHzjpfxDPQoB662swXswY243Sf7Artx4x1r0';
+const supabase = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+
+let currentUser = null;
+let saveTimeout = null;
+const DEFAULT_SP = ["Sun Conure","Blue Fronted Amazon","African Grey","Eclectus","Hahn's Macaw"];
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+let cages = [];
+let transactions = [];
+let speciesList = [...DEFAULT_SP];
+let soldBirds = {};
+
+async function save() {
+  if (!currentUser) return;
+  clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(async () => {
+    const { error } = await supabase.from('bpj_data').upsert({
+      user_id: currentUser.id,
+      cages, transactions,
+      species_list: speciesList,
+      sold_birds: soldBirds,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'user_id' });
+    if (error) console.error('Save error:', error.message);
+  }, 600);
+}
+
+async function loadData() {
+  const { data, error } = await supabase.from('bpj_data').select('*').eq('user_id', currentUser.id).single();
+  if (error && error.code !== 'PGRST116') { console.error('Load error:', error.message); return; }
+  if (data) {
+    cages = data.cages || [];
+    transactions = data.transactions || [];
+    speciesList = (data.species_list && data.species_list.length) ? data.species_list : [...DEFAULT_SP];
+    soldBirds = data.sold_birds || {};
+  } else {
+    cages = []; transactions = []; speciesList = [...DEFAULT_SP]; soldBirds = {};
+    await supabase.from('bpj_data').insert({ user_id: currentUser.id, cages: [], transactions: [], species_list: speciesList, sold_birds: {} });
+  }
+}
+
+/* ---- AUTH ---- */
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pwd = document.getElementById('login-password').value;
+  const btn = document.getElementById('login-btn');
+  if (!email || !pwd) { showLoginError('Please enter your email and password.'); return; }
+  btn.textContent = 'Signing in…'; btn.disabled = true;
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password: pwd });
+    btn.textContent = '🔑 Sign In'; btn.disabled = false;
+    if (error) {
+      if (error.message.includes('Email not confirmed')) {
+        showLoginError('Please confirm your email first — check your inbox for a confirmation link from Supabase.');
+      } else if (error.message.includes('Invalid login credentials')) {
+        showLoginError('Wrong email or password. Try again, or click "Create Account" if you haven\'t signed up yet.');
+      } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+        showLoginError('Cannot connect to the server. Please check your internet connection and try again.');
+      } else {
+        showLoginError('Error: ' + error.message);
+      }
+      return;
+    }
+    await launchApp(data.user);
+  } catch(e) {
+    btn.textContent = '🔑 Sign In'; btn.disabled = false;
+    showLoginError('Connection error: ' + e.message + '. Check your internet connection.');
+  }
+}
+
+async function doSignup() {
+  const email = document.getElementById('login-email').value.trim();
+  const pwd = document.getElementById('login-password').value;
+  const btn = document.getElementById('signup-btn');
+  if (!email || !pwd) { showLoginError('Please enter an email and password.'); return; }
+  if (pwd.length < 6) { showLoginError('Password must be at least 6 characters.'); return; }
+  btn.textContent = 'Creating…'; btn.disabled = true;
+  try {
+    const { data, error } = await supabase.auth.signUp({ email, password: pwd });
+    btn.textContent = '✉️ Create Account'; btn.disabled = false;
+    if (error) { showLoginError('Signup error: ' + error.message); return; }
+    // Try to sign in immediately (works when email confirmation is disabled)
+    const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({ email, password: pwd });
+    if (!loginError && loginData.user) {
+      await launchApp(loginData.user);
+    } else {
+      showLoginMsg('✅ Account created! You can now sign in with your email and password.');
+    }
+  } catch(e) {
+    btn.textContent = '✉️ Create Account'; btn.disabled = false;
+    showLoginError('Connection error: ' + e.message);
+  }
+}
+
+async function doReset() {
+  const email = document.getElementById('login-email').value.trim();
+  if (!email) { showLoginError('Enter your email address above first.'); return; }
+  const { error } = await supabase.auth.resetPasswordForEmail(email);
+  if (error) { showLoginError(error.message); return; }
+  showLoginMsg('Password reset email sent — check your inbox.');
+}
+
+async function doLogout() {
+  await supabase.auth.signOut();
+  currentUser = null;
+  document.getElementById('app-root').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-password').value = '';
+}
+
+function showLoginError(msg) {
+  const e = document.getElementById('login-error');
+  e.textContent = msg; e.style.display = 'block';
+  document.getElementById('login-msg').style.display = 'none';
+}
+function showLoginMsg(msg) {
+  const e = document.getElementById('login-msg');
+  e.textContent = msg; e.style.display = 'block';
+  document.getElementById('login-error').style.display = 'none';
+}
+
+async function launchApp(user) {
+  currentUser = user;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app-root').style.display = 'block';
+  const short = user.email.length > 22 ? user.email.slice(0,20)+'…' : user.email;
+  document.getElementById('header-user').textContent = '👤 ' + short;
+  await loadData();
+  setCurrentMonth();
+  renderSpeciesTags();
+  renderCages();
+  renderSummaryPanel();
+  populateIncomeBirdDropdown();
+  populateExpCageDropdown();
+  onExpCatChange();
+  setIncomeMode('existing');
+}
+
+function esc(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showToast(m) {
+  const t = document.getElementById('toast');
+  t.textContent = m; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('section-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'finance') { populateFinDDs(); populateIncomeBirdDropdown(); populateExpCageDropdown(); onExpCatChange(); setIncomeMode(incomeMode); renderTransactions(); renderSummary(); }
+  if (name === 'family') renderFamilyList();
+}
+
+/* ---- SPECIES ---- */
+function toggleSpecies() {
+  const b = document.getElementById('sp-body'), a = document.getElementById('sp-arrow');
+  const o = b.classList.toggle('open');
+  a.textContent = o ? '▲ collapse' : '▼ expand to edit';
+}
+
+function renderSpeciesTags() {
+  document.getElementById('sp-tags').innerHTML = speciesList.map((s,i) => `
+    <span class="sp-tag">🐦 ${esc(s)}<button onclick="removeSpecies(${i})">✕</button></span>`).join('');
+  populateAllDDs();
+}
+
+function addSpecies() {
+  const inp = document.getElementById('new-sp-inp');
+  const v = inp.value.trim();
+  if (!v) { showToast('Enter a species name'); return; }
+  if (speciesList.some(s => s.toLowerCase() === v.toLowerCase())) { showToast('Species already exists'); return; }
+  speciesList.push(v); inp.value = '';
+  save(); renderSpeciesTags(); showToast(v + ' added');
+}
+
+function removeSpecies(i) {
+  if (!confirm('Remove "' + speciesList[i] + '" from the list?')) return;
+  speciesList.splice(i, 1);
+  save(); renderSpeciesTags(); showToast('Species removed');
+}
+
+function buildOpts(blank, blankLbl) {
+  let h = blank ? `<option value="">${esc(blankLbl)}</option>` : '';
+  speciesList.forEach(s => { h += `<option value="${esc(s)}">${esc(s)}</option>`; });
+  h += '<option value="__custom__">✏️ Other / Custom...</option>';
+  return h;
+}
+
+function buildBirdOpts(sexFilter, excludeId, speciesFilter) {
+  let h = '<option value="">— geen / onbekend —</option>';
+  const matches = getAllBirds().filter(b => {
+    if (b.id === excludeId) return false;
+    if (sexFilter && b.sex !== sexFilter && b.sex !== 'Unknown') return false;
+    if (speciesFilter && b.type !== speciesFilter) return false;
+    return true;
+  });
+  if (matches.length === 0) {
+    h = `<option value="">— no ${speciesFilter ? speciesFilter + ' ' : ''}${sexFilter === 'Male' ? 'males' : sexFilter === 'Female' ? 'females' : 'birds'} available —</option>`;
+  } else {
+    matches.forEach(b => {
+      const cage = cages.find(c => c.birds.some(x => x.id === b.id));
+      const label = b.ring ? `${b.type} [${b.ring}]` : `${b.type} (${cage ? cage.name : '?'})`;
+      h += `<option value="${b.id}">${esc(label)}</option>`;
+    });
+  }
+  return h;
+}
+
+function getAllBirds() {
+  const live = cages.flatMap(c => c.birds.map(b => ({...b, cageId: c.id, sold: false})));
+  const sold = Object.values(soldBirds).map(b => ({...b, sold: true}));
+  return [...live, ...sold];
+}
+
+function getBirdById(id) {
+  for (const c of cages) {
+    const b = c.birds.find(x => x.id === id);
+    if (b) return {...b, sold: false};
+  }
+  if (soldBirds[id]) return {...soldBirds[id], sold: true};
+  return null;
+}
+
+function isBirdSold(id) {
+  return !!soldBirds[id];
+}
+
+function birdLabel(b) {
+  if (!b) return 'Unknown';
+  return b.ring ? `${b.type} [${b.ring}]` : b.type;
+}
+
+function populateAllDDs() {
+  const mo = document.getElementById('mo-sp');
+  if (mo) mo.innerHTML = buildOpts(false, '');
+  populateFinDDs();
+}
+
+function populateFinDDs() {
+  const i = document.getElementById('exp-sp'), e = document.getElementById('exp-sp-other');
+  if (i) i.innerHTML = buildOpts(true, '— select —');
+  if (e) e.innerHTML = buildOpts(true, '— optional —');
+}
+
+/* ---- CAGES ---- */
+function addCage() {
+  const nm = document.getElementById('new-cage-nm').value.trim();
+  if (!nm) { showToast('Enter a cage number or name'); return; }
+  if (cages.find(c => c.name.toLowerCase() === nm.toLowerCase())) { showToast('A cage with that name already exists'); return; }
+  cages.push({ id: Date.now().toString(), name: nm, birds: [] });
+  document.getElementById('new-cage-nm').value = '';
+  save(); renderCages(); renderSummaryPanel(); showToast('Cage "' + nm + '" added!');
+}
+
+function deleteCage(id) {
+  if (!confirm('Remove this cage and all its birds?')) return;
+  cages = cages.filter(c => c.id !== id);
+  save(); renderCages(); renderSummaryPanel(); showToast('Cage removed');
+}
+
+function startEditCageName(id) {
+  document.getElementById('cage-hd-view-' + id).style.display = 'none';
+  const editRow = document.getElementById('cage-hd-edit-' + id);
+  editRow.style.display = 'flex';
+  document.getElementById('cage-cnt-' + id).style.display = 'none';
+  const inp = document.getElementById('cage-nm-input-' + id);
+  inp.focus(); inp.select();
+}
+
+function cancelEditCageName(id) {
+  document.getElementById('cage-hd-view-' + id).style.display = 'flex';
+  document.getElementById('cage-hd-edit-' + id).style.display = 'none';
+  document.getElementById('cage-cnt-' + id).style.display = '';
+}
+
+function saveEditCageName(id) {
+  const newName = document.getElementById('cage-nm-input-' + id).value.trim();
+  if (!newName) { showToast('Cage name cannot be empty'); return; }
+  if (cages.some(c => c.id !== id && c.name.toLowerCase() === newName.toLowerCase())) {
+    showToast('A cage with that name already exists'); return;
+  }
+  const cage = cages.find(c => c.id === id);
+  if (!cage) return;
+  cage.name = newName;
+  save(); renderCages(); renderSummaryPanel(); populateExpCageDropdown();
+  showToast('Cage renamed to "' + newName + '"');
+}
+
+
+function openAddBird(cageId) {
+  document.getElementById('mo-title').textContent = '🐦 Add Bird to Cage';
+  document.getElementById('mo-bird-id').value = '';
+  document.getElementById('mo-cage-id').value = cageId;
+  const cage = cages.find(c => c.id === cageId);
+  const sel = document.getElementById('mo-sp');
+
+  // If cage already has birds, lock species to the existing one
+  const existingSpecies = cage && cage.birds.length > 0 ? cage.birds[0].type : null;
+
+  if (existingSpecies) {
+    // Only show the matching species + custom option
+    sel.innerHTML = `<option value="${esc(existingSpecies)}">${esc(existingSpecies)}</option><option value="__custom__">✏️ Other / Custom...</option>`;
+    sel.value = existingSpecies;
+    sel.disabled = true;
+    sel.title = 'Species locked to ' + existingSpecies + ' (cage already contains this species)';
+    // Show lock notice
+    let notice = document.getElementById('mo-species-lock');
+    if (!notice) {
+      notice = document.createElement('div');
+      notice.id = 'mo-species-lock';
+      notice.style = 'font-size:.75rem;color:var(--g600);background:var(--g50);border:1px solid var(--g200);border-radius:6px;padding:.4rem .7rem;margin-bottom:.5rem;';
+      sel.parentNode.parentNode.insertBefore(notice, sel.parentNode.nextSibling);
+    }
+    notice.innerHTML = '🔒 This cage only accepts <strong>' + esc(existingSpecies) + '</strong>';
+    notice.style.display = 'block';
+  } else {
+    sel.innerHTML = buildOpts(false, '');
+    sel.value = speciesList[0] || '';
+    sel.disabled = false;
+    sel.title = '';
+    const notice = document.getElementById('mo-species-lock');
+    if (notice) notice.style.display = 'none';
+  }
+
+  document.getElementById('mo-custom-wrap').style.display = 'none';
+  document.getElementById('mo-custom').value = '';
+  document.getElementById('mo-ring').value = '';
+  document.getElementById('mo-age').value = '';
+  document.getElementById('mo-sex').value = 'Unknown';
+  const initSpecies = existingSpecies || speciesList[0] || null;
+  document.getElementById('mo-father').innerHTML = buildBirdOpts('Male', null, initSpecies);
+  document.getElementById('mo-mother').innerHTML = buildBirdOpts('Female', null, initSpecies);
+  document.getElementById('add-bird-mo').classList.add('open');
+}
+
+function openEditBird(cageId, birdId) {
+  const cage = cages.find(c => c.id === cageId);
+  const bird = cage && cage.birds.find(b => b.id === birdId);
+  if (!bird) return;
+
+  document.getElementById('mo-title').textContent = '✏️ Edit Bird Details';
+  document.getElementById('mo-cage-id').value = cageId;
+  document.getElementById('mo-bird-id').value = birdId;
+
+  // Species — unlock dropdown and set to bird's current species
+  const sel = document.getElementById('mo-sp');
+  sel.innerHTML = buildOpts(false, '');
+  sel.disabled = false;
+  sel.title = '';
+  // If cage has more than this one bird, lock species
+  if (cage.birds.length > 1) {
+    sel.innerHTML = `<option value="${esc(bird.type)}">${esc(bird.type)}</option>`;
+    sel.disabled = true;
+  }
+  sel.value = bird.type;
+
+  const notice = document.getElementById('mo-species-lock');
+  if (notice) notice.style.display = 'none';
+  document.getElementById('mo-custom-wrap').style.display = 'none';
+  document.getElementById('mo-ring').value = bird.ring || '';
+  document.getElementById('mo-age').value = bird.age || '';
+  document.getElementById('mo-sex').value = bird.sex || 'Unknown';
+  document.getElementById('mo-father').innerHTML = buildBirdOpts('Male', birdId, bird.type);
+  document.getElementById('mo-mother').innerHTML = buildBirdOpts('Female', birdId, bird.type);
+  document.getElementById('mo-father').value = bird.fatherId || '';
+  document.getElementById('mo-mother').value = bird.motherId || '';
+
+  document.getElementById('add-bird-mo').classList.add('open');
+}
+
+
+function onModalSpChange() {
+  const v = document.getElementById('mo-sp').value;
+  document.getElementById('mo-custom-wrap').style.display = v === '__custom__' ? 'block' : 'none';
+  const species = (v === '__custom__' || v === '') ? null : v;
+  document.getElementById('mo-father').innerHTML = buildBirdOpts('Male', null, species);
+  document.getElementById('mo-mother').innerHTML = buildBirdOpts('Female', null, species);
+}
+
+function closeModal() {
+  document.getElementById('add-bird-mo').classList.remove('open');
+  document.getElementById('mo-sp').disabled = false;
+}
+
+function saveBird() {
+  const cageId = document.getElementById('mo-cage-id').value;
+  const editBirdId = document.getElementById('mo-bird-id').value;
+  let type = document.getElementById('mo-sp').value;
+  if (type === '__custom__') {
+    type = document.getElementById('mo-custom').value.trim();
+    if (!type) { showToast('Enter a custom species name'); return; }
+  }
+  if (!type) { showToast('Please select a species'); return; }
+  const ring = document.getElementById('mo-ring').value.trim();
+  const age = document.getElementById('mo-age').value.trim();
+  const sex = document.getElementById('mo-sex').value;
+  const fatherId = document.getElementById('mo-father').value;
+  const motherId = document.getElementById('mo-mother').value;
+  const cage = cages.find(c => c.id === cageId);
+  if (!cage) return;
+
+  if (editBirdId) {
+    // EDIT MODE — update existing bird
+    const bird = cage.birds.find(b => b.id === editBirdId);
+    if (!bird) return;
+    bird.type = type; bird.ring = ring; bird.age = age; bird.sex = sex;
+    bird.fatherId = fatherId || ''; bird.motherId = motherId || '';
+    save(); closeModal(); renderCages(); renderSummaryPanel(); populateIncomeBirdDropdown();
+    showToast('Bird updated!');
+  } else {
+    // ADD MODE — check species rule and push new bird
+    if (cage.birds.length > 0 && cage.birds[0].type !== type) {
+      showToast('This cage already contains ' + cage.birds[0].type + ' — different species not allowed in the same cage');
+      return;
+    }
+    cage.birds.push({ id: Date.now().toString(), type, ring, age, sex, fatherId: fatherId||'', motherId: motherId||'' });
+    save(); closeModal(); renderCages(); renderSummaryPanel();
+    showToast('Bird added to ' + cage.name);
+  }
+}
+
+function removeBird(cageId, birdId) {
+  const cage = cages.find(c => c.id === cageId);
+  if (!cage) return;
+  cage.birds = cage.birds.filter(b => b.id !== birdId);
+  save(); renderCages(); renderSummaryPanel(); showToast('Bird removed');
+}
+
+function sexEmoji(s) { return s === 'Male' ? ' ♂' : s === 'Female' ? ' ♀' : ''; }
+function sexClass(s) { return s === 'Male' ? 'male' : s === 'Female' ? 'female' : 'unknown'; }
+
+function renderCages() {
+  const g = document.getElementById('cages-grid');
+  if (!cages.length) {
+    g.innerHTML = `<div class="empty-st" style="grid-column:1/-1"><div class="big-i">🏡</div><h3>No cages yet</h3><p>Add your first cage above to get started.</p></div>`;
+    return;
+  }
+  g.innerHTML = cages.map(cage => `
+    <div class="cage-card">
+      <div class="cage-hd">
+        <div class="cage-hd-l" id="cage-hd-view-${cage.id}">
+          <span style="font-size:1.3rem;">🏠</span>
+          <span class="cage-nm">${esc(cage.name)}</span>
+          <button class="btn-icon-edit" onclick="startEditCageName('${cage.id}')" title="Edit cage name">✏️</button>
+        </div>
+        <div class="cage-hd-edit" id="cage-hd-edit-${cage.id}" style="display:none;flex:1;align-items:center;gap:.4rem;">
+          <input type="text" id="cage-nm-input-${cage.id}" value="${esc(cage.name)}"
+            style="flex:1;padding:.28rem .5rem;font-size:.88rem;border-radius:6px;border:1.5px solid rgba(255,255,255,.5);background:rgba(255,255,255,.15);color:white;min-width:0;"
+            onkeydown="if(event.key==='Enter')saveEditCageName('${cage.id}');if(event.key==='Escape')cancelEditCageName('${cage.id}')">
+          <button onclick="saveEditCageName('${cage.id}')" style="background:white;color:var(--g700);border:none;border-radius:5px;padding:.22rem .55rem;font-size:.76rem;font-weight:600;cursor:pointer;">✓</button>
+          <button onclick="cancelEditCageName('${cage.id}')" style="background:rgba(255,255,255,.2);color:white;border:none;border-radius:5px;padding:.22rem .55rem;font-size:.76rem;cursor:pointer;">✕</button>
+        </div>
+        <span class="cage-cnt" id="cage-cnt-${cage.id}">${cage.birds.length} bird${cage.birds.length !== 1 ? 's' : ''}</span>
+      </div>
+      <div class="cage-body">
+        <div class="bird-list">
+          ${cage.birds.length === 0 ? '<p class="no-birds">No birds yet — add some below</p>' :
+            cage.birds.map(b => {
+              const sc = sexClass(b.sex);
+              const parentInfo = [];
+              if (b.fatherId) { const f = getBirdById(b.fatherId); if (f) parentInfo.push('F: ' + birdLabel(f)); }
+              if (b.motherId) { const m = getBirdById(b.motherId); if (m) parentInfo.push('M: ' + birdLabel(m)); }
+              return `<div class="bird-item ${sc}">
+                <div class="bird-info">
+                  <span class="bird-type">🐦 ${esc(b.type)}${sexEmoji(b.sex)}</span>
+                  <span class="bird-meta">${[b.ring ? 'Ring: '+b.ring : '', b.age ? 'Age: '+b.age : ''].filter(Boolean).join(' · ')}</span>
+                  ${parentInfo.length ? '<span class="bird-meta" style="color:#888;">'+parentInfo.join(' | ')+'</span>' : ''}
+                </div>
+                <div style="display:flex;gap:.3rem;">
+                  <button class="btn btn-s btn-sm" onclick="openEditBird('${cage.id}','${b.id}')" title="Edit bird">✏️</button>
+                  <button class="btn btn-d btn-sm" onclick="removeBird('${cage.id}','${b.id}')">✕</button>
+                </div>
+              </div>`;
+            }).join('')}
+        </div>
+      </div>
+      <div class="cage-ft">
+        <button class="btn btn-s btn-sm" onclick="openAddBird('${cage.id}')">+ Add Bird</button>
+        <button class="btn btn-d btn-sm" onclick="deleteCage('${cage.id}')">🗑 Remove Cage</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderSummaryPanel() {
+  const all = getAllBirds();
+  const byType = {};
+  all.forEach(b => { byType[b.type] = (byType[b.type]||0)+1; });
+  document.getElementById('st-cages').textContent = cages.length;
+  document.getElementById('st-birds').textContent = all.length;
+  document.getElementById('st-males').textContent = all.filter(b => b.sex==='Male').length;
+  document.getElementById('st-females').textContent = all.filter(b => b.sex==='Female').length;
+  document.getElementById('st-sp').textContent = Object.keys(byType).length;
+  const bd = document.getElementById('sp-brkdn');
+  if (!Object.keys(byType).length) { bd.innerHTML='<p style="color:var(--muted);font-size:.82rem;font-style:italic;">No birds yet</p>'; return; }
+  bd.innerHTML = Object.entries(byType).sort((a,b)=>b[1]-a[1]).map(([sp,cnt])=>
+    `<div class="sp-row"><span class="sp-nm">🐦 ${esc(sp)}</span><span class="sp-ct">${cnt} bird${cnt!==1?'s':''}</span></div>`).join('');
+}
+
+/* ---- FAMILY TREE ---- */
+function renderFamilyList() {
+  const all = getAllBirds();
+  const el = document.getElementById('ft-bird-list');
+  if (!all.length) { el.innerHTML='<p style="color:var(--muted);font-size:.82rem;font-style:italic;">No birds yet</p>'; return; }
+
+  const live = all.filter(b => !b.sold);
+  const sold = all.filter(b => b.sold);
+
+  const birdItem = (b) => {
+    const cage = cages.find(c => c.birds.some(x => x.id === b.id));
+    const soldData = soldBirds[b.id];
+    const subLabel = b.sold ? (soldData ? soldData.soldDate : 'Sold') : (cage ? cage.name : '');
+    return `<div class="bird-select-item ${b.sold ? 'sold-bird' : ''}" id="bsi-${b.id}" onclick="selectFamilyBird('${b.id}')">
+      <div class="bsi-dot ${b.sold ? 'sold' : sexClass(b.sex)}"></div>
+      <div class="bsi-info">
+        <span class="bsi-name ${b.sold ? 'bsi-sold' : ''}">${esc(b.type)}${sexEmoji(b.sex)}${b.ring ? ' ['+esc(b.ring)+']' : ''}${b.sold ? ' <span style="background:#e53e3e;color:white;font-size:.6rem;padding:1px 5px;border-radius:4px;font-weight:600;vertical-align:middle;">SOLD</span>' : ''}</span>
+        <span class="bsi-sub" style="${b.sold ? 'color:#e53e3e;' : ''}">${subLabel}</span>
+      </div>
+    </div>`;
+  };
+
+  // Group birds by species
+  const groupBySpecies = (birds) => {
+    const map = {};
+    birds.forEach(b => { if (!map[b.type]) map[b.type] = []; map[b.type].push(b); });
+    return map;
+  };
+
+  const speciesGroup = (species, birds, isSold, groupIdx) => {
+    const gid = (isSold ? 'sg-sold-' : 'sg-live-') + groupIdx;
+    const count = birds.length;
+    const hdrStyle = isSold
+      ? 'background:#fef2f2;border:1px solid #fca5a5;color:#b91c1c;'
+      : 'background:var(--g50);border:1px solid var(--g200);color:var(--g700);';
+    const arrowColor = isSold ? '#b91c1c' : 'var(--g600)';
+    return `
+      <div style="margin-bottom:.45rem;">
+        <div onclick="toggleFtGroup('${gid}')"
+          style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;
+                 ${hdrStyle}border-radius:7px;padding:.35rem .65rem;user-select:none;">
+          <span style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">
+            🐦 ${esc(species)} (${count})
+          </span>
+          <span id="${gid}-arrow" style="font-size:.72rem;color:${arrowColor};">▼</span>
+        </div>
+        <div id="${gid}-body" style="padding-left:.3rem;">
+          ${birds.map(birdItem).join('')}
+        </div>
+      </div>`;
+  };
+
+  let html = '';
+
+  // ---- LIVE BIRDS ----
+  if (live.length) {
+    const liveGroups = groupBySpecies(live);
+    html += `<div style="font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;
+               letter-spacing:.08em;padding:.3rem .1rem .5rem;">In Cages — ${live.length} bird${live.length!==1?'s':''}</div>`;
+    Object.entries(liveGroups).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([sp, birds], i) => {
+      html += speciesGroup(sp, birds, false, i);
+    });
+  }
+
+  // ---- SOLD BIRDS ----
+  if (sold.length) {
+    const soldGroups = groupBySpecies(sold);
+    const soldGid = 'sg-sold-outer';
+    html += `
+      <div style="margin-top:1rem;">
+        <div onclick="toggleFtGroup('${soldGid}')"
+          style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;
+                 background:#fef2f2;border:1.5px solid #fca5a5;border-radius:8px;
+                 padding:.45rem .7rem;user-select:none;margin-bottom:.5rem;">
+          <span style="font-size:.7rem;font-weight:700;color:#b91c1c;text-transform:uppercase;letter-spacing:.07em;">
+            🏷️ Sold Birds — ${sold.length} bird${sold.length!==1?'s':''}
+          </span>
+          <span id="${soldGid}-arrow" style="font-size:.75rem;color:#b91c1c;">▼</span>
+        </div>
+        <div id="${soldGid}-body">
+          ${Object.entries(soldGroups).sort((a,b)=>a[0].localeCompare(b[0])).map(([sp, birds], i) =>
+            speciesGroup(sp, birds, true, i)).join('')}
+        </div>
+      </div>`;
+  }
+
+  el.innerHTML = html;
+}
+
+let selectedBirdId = null;
+
+function toggleFtGroup(gid) {
+  const body = document.getElementById(gid + '-body');
+  const arrow = document.getElementById(gid + '-arrow');
+  if (!body) return;
+  const collapsed = body.style.display === 'none';
+  body.style.display = collapsed ? 'block' : 'none';
+  if (arrow) arrow.textContent = collapsed ? '▼' : '▶';
+}
+
+function selectFamilyBird(id) {
+  selectedBirdId = id;
+  document.querySelectorAll('.bird-select-item').forEach(el => el.classList.remove('selected'));
+  const el = document.getElementById('bsi-' + id);
+  if (el) el.classList.add('selected');
+  drawFamilyTree(id);
+}
+
+/* ---- TREE DRAWING ---- */
+// Node dimensions
+const NW = 160, NH = 56, HGAP = 36, VGAP = 52;
+
+function drawFamilyTree(rootId) {
+  const empty = document.getElementById('ft-empty');
+  const svg = document.getElementById('ft-svg');
+  empty.style.display = 'none';
+  svg.style.display = 'block';
+
+  const bird = getBirdById(rootId);
+  if (!bird) return;
+
+  // Build tree: root + 2 generations up + 1 generation down
+  // Layout: rows = [grandparents, parents, root, children]
+  const nodes = []; // {id, bird, col, row, label}
+  const edges = []; // {fromId, toId}
+
+  // root at row 2, col 0 (will be centered)
+  const rootNode = { id: rootId, bird, row: 2, col: 0 };
+  nodes.push(rootNode);
+
+  // parents
+  if (bird.fatherId) {
+    const f = getBirdById(bird.fatherId);
+    if (f) {
+      nodes.push({ id: f.id, bird: f, row: 1, col: -1 });
+      edges.push({ fromId: f.id, toId: rootId });
+      // paternal grandparents
+      if (f.fatherId) { const gf = getBirdById(f.fatherId); if (gf) { nodes.push({ id: gf.id, bird: gf, row: 0, col: -2 }); edges.push({ fromId: gf.id, toId: f.id }); } }
+      if (f.motherId) { const gm = getBirdById(f.motherId); if (gm) { nodes.push({ id: gm.id, bird: gm, row: 0, col: -1 }); edges.push({ fromId: gm.id, toId: f.id }); } }
+    }
+  }
+  if (bird.motherId) {
+    const m = getBirdById(bird.motherId);
+    if (m) {
+      nodes.push({ id: m.id, bird: m, row: 1, col: 1 });
+      edges.push({ fromId: m.id, toId: rootId });
+      // maternal grandparents
+      if (m.fatherId) { const gf = getBirdById(m.fatherId); if (gf) { nodes.push({ id: gf.id, bird: gf, row: 0, col: 1 }); edges.push({ fromId: gf.id, toId: m.id }); } }
+      if (m.motherId) { const gm = getBirdById(m.motherId); if (gm) { nodes.push({ id: gm.id, bird: gm, row: 0, col: 2 }); edges.push({ fromId: gm.id, toId: m.id }); } }
+    }
+  }
+
+  // children: birds that have rootId as father or mother
+  const children = getAllBirds().filter(b => b.fatherId === rootId || b.motherId === rootId);
+  children.forEach((ch, i) => {
+    nodes.push({ id: ch.id, bird: ch, row: 3, col: i - Math.floor(children.length / 2) });
+    edges.push({ fromId: rootId, toId: ch.id });
+  });
+
+  // Compute positions
+  const colRange = nodes.map(n => n.col);
+  const minCol = Math.min(...colRange), maxCol = Math.max(...colRange);
+  const rowRange = nodes.map(n => n.row);
+  const minRow = Math.min(...rowRange), maxRow = Math.max(...rowRange);
+
+  const PAD = 30;
+  const colOffset = -minCol;
+  const rowOffset = -minRow;
+  const totalW = (maxCol - minCol + 1) * (NW + HGAP) - HGAP + PAD*2;
+  const totalH = (maxRow - minRow + 1) * (NH + VGAP) - VGAP + PAD*2;
+
+  const posOf = (n) => ({
+    x: PAD + (n.col + colOffset) * (NW + HGAP),
+    y: PAD + (n.row + rowOffset) * (NH + VGAP)
+  });
+
+  // Draw SVG
+  svg.setAttribute('width', Math.max(700, totalW));
+  svg.setAttribute('height', Math.max(350, totalH));
+  svg.innerHTML = '';
+
+  // Row labels
+  const rowLabels = { 0: 'Grandparents', 1: 'Parents', 2: 'Selected Bird', 3: 'Offspring' };
+  const rowsPresent = [...new Set(nodes.map(n => n.row))];
+  rowsPresent.forEach(r => {
+    const y = PAD + (r + rowOffset) * (NH + VGAP) + NH/2;
+    const lbl = document.createElementNS('http://www.w3.org/2000/svg','text');
+    lbl.setAttribute('x', 8);
+    lbl.setAttribute('y', y + 5);
+    lbl.setAttribute('font-size', '10');
+    lbl.setAttribute('fill', '#5a7a5a');
+    lbl.setAttribute('font-family', 'DM Sans, sans-serif');
+    lbl.setAttribute('font-weight', '500');
+    lbl.setAttribute('transform', `rotate(-90, 8, ${y})`);
+    lbl.textContent = rowLabels[r] || '';
+    svg.appendChild(lbl);
+  });
+
+  // Edges first (behind nodes)
+  edges.forEach(e => {
+    const fromN = nodes.find(n => n.id === e.fromId);
+    const toN = nodes.find(n => n.id === e.toId);
+    if (!fromN || !toN) return;
+    const fp = posOf(fromN), tp = posOf(toN);
+    const x1 = fp.x + NW/2, y1 = fp.y + NH;
+    const x2 = tp.x + NW/2, y2 = tp.y;
+    const my = (y1 + y2) / 2;
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d', `M${x1},${y1} C${x1},${my} ${x2},${my} ${x2},${y2}`);
+    path.setAttribute('class', 'tree-conn');
+    svg.appendChild(path);
+  });
+
+  // Nodes
+  nodes.forEach(n => {
+    const p = posOf(n);
+    const isRoot = n.id === rootId;
+    const isMale = n.bird.sex === 'Male';
+    const isFemale = n.bird.sex === 'Female';
+    const isSold = isBirdSold(n.id);
+
+    let fillColor = '#f0faf0', strokeColor = '#72c472', textColor = '#155015';
+    if (isSold) { fillColor = '#fff5f5'; strokeColor = '#e53e3e'; textColor = '#9b2c2c'; }
+    else if (isRoot) { fillColor = '#155015'; strokeColor = '#0d360d'; textColor = '#ffffff'; }
+    else if (isMale) { fillColor = '#e6f2fa'; strokeColor = '#1a6fa8'; textColor = '#0d3d5e'; }
+    else if (isFemale) { fillColor = '#faeaf3'; strokeColor = '#a8336e'; textColor = '#6b1f44'; }
+
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+
+    const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    rect.setAttribute('x', p.x); rect.setAttribute('y', p.y);
+    rect.setAttribute('width', NW); rect.setAttribute('height', NH);
+    rect.setAttribute('rx', 8); rect.setAttribute('ry', 8);
+    rect.setAttribute('fill', fillColor);
+    rect.setAttribute('stroke', strokeColor);
+    rect.setAttribute('stroke-width', (isRoot || isSold) ? '2.5' : '1.5');
+    if (isSold) rect.setAttribute('stroke-dasharray', '0');
+    g.appendChild(rect);
+
+    // Sex dot
+    if (!isRoot) {
+      const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      dot.setAttribute('cx', p.x + 14); dot.setAttribute('cy', p.y + NH/2);
+      dot.setAttribute('r', 4);
+      dot.setAttribute('fill', isSold ? '#e53e3e' : isMale ? '#1a6fa8' : isFemale ? '#a8336e' : '#5a7a5a');
+      g.appendChild(dot);
+    }
+
+    // Bird type
+    const typeText = document.createElementNS('http://www.w3.org/2000/svg','text');
+    typeText.setAttribute('x', p.x + (isRoot ? NW/2 : 24));
+    typeText.setAttribute('y', p.y + 20);
+    typeText.setAttribute('font-size', '11');
+    typeText.setAttribute('font-weight', '500');
+    typeText.setAttribute('fill', textColor);
+    typeText.setAttribute('font-family', 'DM Sans, sans-serif');
+    if (isRoot) typeText.setAttribute('text-anchor', 'middle');
+    const typeLabel = n.bird.type.length > 18 ? n.bird.type.slice(0,16)+'…' : n.bird.type;
+    typeText.textContent = typeLabel + (n.bird.sex === 'Male' ? ' ♂' : n.bird.sex === 'Female' ? ' ♀' : '');
+    g.appendChild(typeText);
+
+    // Ring number
+    if (n.bird.ring) {
+      const ringText = document.createElementNS('http://www.w3.org/2000/svg','text');
+      ringText.setAttribute('x', p.x + (isRoot ? NW/2 : 24));
+      ringText.setAttribute('y', p.y + 35);
+      ringText.setAttribute('font-size', '9.5');
+      ringText.setAttribute('fill', isSold ? '#e53e3e' : isRoot ? 'rgba(255,255,255,.8)' : '#5a7a5a');
+      ringText.setAttribute('font-family', 'DM Sans, sans-serif');
+      if (isRoot) ringText.setAttribute('text-anchor', 'middle');
+      const rLabel = n.bird.ring.length > 20 ? n.bird.ring.slice(0,18)+'…' : n.bird.ring;
+      ringText.textContent = 'Ring: ' + rLabel;
+      g.appendChild(ringText);
+    }
+
+    // Age
+    if (n.bird.age && !n.bird.ring) {
+      const ageText = document.createElementNS('http://www.w3.org/2000/svg','text');
+      ageText.setAttribute('x', p.x + (isRoot ? NW/2 : 24));
+      ageText.setAttribute('y', p.y + 35);
+      ageText.setAttribute('font-size', '9.5');
+      ageText.setAttribute('fill', isSold ? '#e53e3e' : isRoot ? 'rgba(255,255,255,.8)' : '#5a7a5a');
+      ageText.setAttribute('font-family', 'DM Sans, sans-serif');
+      if (isRoot) ageText.setAttribute('text-anchor', 'middle');
+      ageText.textContent = n.bird.age;
+      g.appendChild(ageText);
+    }
+
+    // SOLD strikethrough lines (two diagonal red lines across node)
+    if (isSold) {
+      const line1 = document.createElementNS('http://www.w3.org/2000/svg','line');
+      line1.setAttribute('x1', p.x + 6); line1.setAttribute('y1', p.y + 6);
+      line1.setAttribute('x2', p.x + NW - 6); line1.setAttribute('y2', p.y + NH - 6);
+      line1.setAttribute('stroke', '#e53e3e'); line1.setAttribute('stroke-width', '2');
+      line1.setAttribute('stroke-linecap', 'round'); line1.setAttribute('opacity', '0.7');
+      g.appendChild(line1);
+      const line2 = document.createElementNS('http://www.w3.org/2000/svg','line');
+      line2.setAttribute('x1', p.x + NW - 6); line2.setAttribute('y1', p.y + 6);
+      line2.setAttribute('x2', p.x + 6); line2.setAttribute('y2', p.y + NH - 6);
+      line2.setAttribute('stroke', '#e53e3e'); line2.setAttribute('stroke-width', '2');
+      line2.setAttribute('stroke-linecap', 'round'); line2.setAttribute('opacity', '0.7');
+      g.appendChild(line2);
+      // SOLD badge
+      const soldBadge = document.createElementNS('http://www.w3.org/2000/svg','rect');
+      soldBadge.setAttribute('x', p.x + NW/2 - 18); soldBadge.setAttribute('y', p.y - 12);
+      soldBadge.setAttribute('width', 36); soldBadge.setAttribute('height', 13);
+      soldBadge.setAttribute('rx', 4); soldBadge.setAttribute('fill', '#e53e3e');
+      svg.appendChild(soldBadge);
+      const soldTxt = document.createElementNS('http://www.w3.org/2000/svg','text');
+      soldTxt.setAttribute('x', p.x + NW/2); soldTxt.setAttribute('y', p.y - 2);
+      soldTxt.setAttribute('text-anchor', 'middle'); soldTxt.setAttribute('font-size', '8');
+      soldTxt.setAttribute('font-weight', '700'); soldTxt.setAttribute('fill', '#fff');
+      soldTxt.setAttribute('font-family', 'DM Sans, sans-serif');
+      soldTxt.setAttribute('letter-spacing', '0.5');
+      soldTxt.textContent = 'SOLD'; svg.appendChild(soldTxt);
+      // Show sale date if available
+      const sd = soldBirds[n.id];
+      if (sd && sd.soldDate) {
+        const dateTxt = document.createElementNS('http://www.w3.org/2000/svg','text');
+        dateTxt.setAttribute('x', p.x + NW/2); dateTxt.setAttribute('y', p.y + NH + 13);
+        dateTxt.setAttribute('text-anchor', 'middle'); dateTxt.setAttribute('font-size', '8.5');
+        dateTxt.setAttribute('fill', '#e53e3e'); dateTxt.setAttribute('font-family', 'DM Sans, sans-serif');
+        dateTxt.textContent = 'Sold: ' + sd.soldDate; svg.appendChild(dateTxt);
+      }
+    }
+
+    // Root label badge (only if not sold)
+    if (isRoot && !isSold) {
+      const badge = document.createElementNS('http://www.w3.org/2000/svg','rect');
+      badge.setAttribute('x', p.x + NW/2 - 28); badge.setAttribute('y', p.y - 14);
+      badge.setAttribute('width', 56); badge.setAttribute('height', 14);
+      badge.setAttribute('rx', 5); badge.setAttribute('fill', '#c9a84c');
+      svg.appendChild(badge);
+      const badgeTxt = document.createElementNS('http://www.w3.org/2000/svg','text');
+      badgeTxt.setAttribute('x', p.x + NW/2); badgeTxt.setAttribute('y', p.y - 3);
+      badgeTxt.setAttribute('text-anchor', 'middle'); badgeTxt.setAttribute('font-size', '8.5');
+      badgeTxt.setAttribute('font-weight', '600'); badgeTxt.setAttribute('fill', '#fff');
+      badgeTxt.setAttribute('font-family', 'DM Sans, sans-serif');
+      badgeTxt.textContent = 'SELECTED'; svg.appendChild(badgeTxt);
+    }
+
+    svg.appendChild(g);
+  });
+
+  // Legend
+  const lx = PAD, ly = totalH - 22;
+  const legendItems = [{color:'#155015',label:'Selected Bird'},{color:'#1a6fa8',label:'Male ♂'},{color:'#a8336e',label:'Female ♀'},{color:'#4aaa4a',label:'Unknown'},{color:'#e53e3e',label:'Sold'}];
+  legendItems.forEach((li, i) => {
+    const rect2 = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    rect2.setAttribute('x', lx + i*110); rect2.setAttribute('y', ly);
+    rect2.setAttribute('width', 10); rect2.setAttribute('height', 10);
+    rect2.setAttribute('rx', 3); rect2.setAttribute('fill', li.color);
+    svg.appendChild(rect2);
+    const lt = document.createElementNS('http://www.w3.org/2000/svg','text');
+    lt.setAttribute('x', lx + i*110 + 14); lt.setAttribute('y', ly + 9);
+    lt.setAttribute('font-size', '9'); lt.setAttribute('fill', '#5a7a5a');
+    lt.setAttribute('font-family', 'DM Sans, sans-serif');
+    lt.textContent = li.label; svg.appendChild(lt);
+  });
+}
+
+/* ---- FINANCE ---- */
+function setCurrentMonth() {
+  const now = new Date(); const m = MONTHS[now.getMonth()]; const y = now.getFullYear();
+  ['inc-month','exp-month'].forEach(id => {
+    const s = document.getElementById(id); if (!s) return;
+    for (let o of s.options) { if (o.value === m) { o.selected = true; break; } }
+  });
+  const iy = document.getElementById('inc-yr'); if(iy) iy.value = y;
+  const ey = document.getElementById('exp-yr'); if(ey) ey.value = y;
+}
+
+function spVal(id) { const s = document.getElementById(id); return (!s || s.value==='__custom__') ? '' : s.value; }
+
+let incomeMode = 'existing';
+
+function setIncomeMode(mode) {
+  incomeMode = mode;
+  const isExisting = mode === 'existing';
+  document.getElementById('inc-existing-fields').style.display = isExisting ? 'block' : 'none';
+  document.getElementById('inc-quick-fields').style.display = isExisting ? 'none' : 'block';
+  document.getElementById('inc-toggle-existing').style.background = isExisting ? 'var(--g500)' : 'transparent';
+  document.getElementById('inc-toggle-existing').style.color = isExisting ? 'white' : 'var(--g600)';
+  document.getElementById('inc-toggle-quick').style.background = isExisting ? 'transparent' : 'var(--g500)';
+  document.getElementById('inc-toggle-quick').style.color = isExisting ? 'var(--g600)' : 'white';
+  const btn = document.getElementById('inc-submit-btn');
+  if (btn) btn.innerHTML = isExisting ? '💰 Record Sale &amp; Remove Bird' : '💰 Record Sale';
+}
+
+function populateIncomeBirdDropdown() {
+  const sel = document.getElementById('inc-bird-id');
+  if (sel) {
+    const liveBirds = cages.flatMap(c => c.birds.map(b => ({...b, cageId: c.id, cageName: c.name})));
+    sel.innerHTML = '<option value="">— select bird to sell —</option>';
+    liveBirds.forEach(b => {
+      const label = [b.type, b.sex !== 'Unknown' ? sexEmoji(b.sex).trim() : '', b.ring ? '['+b.ring+']' : '', '('+b.cageName+')'].filter(Boolean).join(' ');
+      const opt = document.createElement('option');
+      opt.value = b.id; opt.textContent = label;
+      sel.appendChild(opt);
+    });
+  }
+  // Also populate quick sale species dropdown
+  const qsel = document.getElementById('inc-quick-sp');
+  if (qsel) qsel.innerHTML = buildOpts(true, '— select species —');
+}
+
+function populateExpCageDropdown(filterSpecies) {
+  const sel = document.getElementById('exp-cage-id');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— select cage —</option>';
+  cages.forEach(c => {
+    // Show cage if empty or already contains the selected species
+    if (filterSpecies && c.birds.length > 0 && c.birds[0].type !== filterSpecies) return;
+    const opt = document.createElement('option');
+    opt.value = c.id;
+    opt.textContent = c.name + (c.birds.length > 0 ? ' (' + c.birds[0].type + ')' : ' (empty)');
+    sel.appendChild(opt);
+  });
+}
+
+function onIncomeBirdChange() {
+  const birdId = document.getElementById('inc-bird-id').value;
+  const infoBox = document.getElementById('inc-bird-info');
+  if (!birdId) { infoBox.style.display = 'none'; return; }
+  const b = getBirdById(birdId);
+  const cage = cages.find(c => c.birds.some(x => x.id === birdId));
+  if (!b) { infoBox.style.display = 'none'; return; }
+  infoBox.style.display = 'block';
+  infoBox.innerHTML = `🐦 <strong>${esc(b.type)}</strong>${sexEmoji(b.sex)}${b.ring ? ' · Ring: <strong>'+esc(b.ring)+'</strong>' : ''}${b.age ? ' · Age: '+esc(b.age) : ''} · Cage: <strong>${cage ? esc(cage.name) : 'Unknown'}</strong>`;
+}
+
+function onExpCatChange() {
+  const cat = document.getElementById('exp-cat').value;
+  const isPurchase = cat === 'Bird Purchase';
+  document.getElementById('exp-bird-purchase-fields').style.display = isPurchase ? 'flex' : 'none';
+  document.getElementById('exp-other-fields').style.display = isPurchase ? 'none' : 'block';
+  const btn = document.querySelector('#section-finance .btn[onclick="addExpense()"]');
+  if (btn) {
+    btn.innerHTML = isPurchase ? '🛒 Record Purchase &amp; Add Bird' : '+ Add Expense';
+    btn.style.background = '#c0392b';
+  }
+  // Refresh cage dropdown with current species filter
+  const sp = spVal('exp-sp');
+  populateExpCageDropdown(sp || null);
+}
+
+function onExpSpChange() {
+  const sp = spVal('exp-sp');
+  populateExpCageDropdown(sp || null);
+}
+
+function addIncome() {
+  const amount = parseFloat(document.getElementById('inc-amt').value);
+  const month = document.getElementById('inc-month').value;
+  const year = parseInt(document.getElementById('inc-yr').value);
+  if (!amount || amount <= 0) { showToast('Please enter a valid amount'); return; }
+
+  if (incomeMode === 'quick') {
+    const sp = spVal('inc-quick-sp');
+    const qdesc = document.getElementById('inc-quick-desc').value.trim();
+    const fullDesc = ['Quick Sale', sp, qdesc].filter(Boolean).join(' · ');
+    transactions.push({ id: Date.now().toString(), type: 'income', bt: sp, amount, month, year, desc: fullDesc });
+    document.getElementById('inc-quick-desc').value = '';
+    document.getElementById('inc-amt').value = '';
+    save(); renderTransactions(); renderSummary();
+    showToast('Quick sale recorded!');
+    return;
+  }
+
+  // Existing bird sale
+  const birdId = document.getElementById('inc-bird-id').value;
+  if (!birdId) { showToast('Please select the bird that was sold'); return; }
+  const b = getBirdById(birdId);
+  if (!b) { showToast('Bird not found — it may have already been removed'); return; }
+  const cage = cages.find(c => c.birds.some(x => x.id === birdId));
+  const birdSnap = { type: b.type, ring: b.ring, age: b.age, sex: b.sex, fatherId: b.fatherId, motherId: b.motherId };
+  const cageName = cage ? cage.name : '';
+  const desc = [b.type, sexEmoji(b.sex).trim(), b.ring ? 'Ring:'+b.ring : '', 'Cage:'+cageName].filter(Boolean).join(' · ');
+  soldBirds[birdId] = { ...birdSnap, id: birdId, soldCageName: cageName, soldDate: month + ' ' + year };
+  if (cage) cage.birds = cage.birds.filter(x => x.id !== birdId);
+  transactions.push({
+    id: Date.now().toString(), type: 'income',
+    bt: b.type, ring: b.ring, cage: cageName, amount, month, year, desc,
+    linkedBirdId: birdId, linkedBirdSnap: birdSnap, linkedCageId: cage ? cage.id : ''
+  });
+  document.getElementById('inc-bird-id').value = '';
+  document.getElementById('inc-bird-info').style.display = 'none';
+  document.getElementById('inc-amt').value = '';
+  save(); populateIncomeBirdDropdown(); renderCages(); renderSummaryPanel();
+  renderTransactions(); renderSummary();
+  showToast(b.type + (b.ring ? ' ['+b.ring+']' : '') + ' sold & removed from ' + (cageName || 'cage'));
+}
+
+function addExpense() {
+  const cat = document.getElementById('exp-cat').value;
+  const desc = document.getElementById('exp-desc').value.trim();
+  const amount = parseFloat(document.getElementById('exp-amt').value);
+  const month = document.getElementById('exp-month').value;
+  const year = parseInt(document.getElementById('exp-yr').value);
+  if (!amount || amount <= 0) { showToast('Please enter a valid amount'); return; }
+
+  let linkedBirdId = '', linkedCageId = '';
+
+  if (cat === 'Bird Purchase') {
+    const bt = spVal('exp-sp');
+    const ring = document.getElementById('exp-ring').value.trim();
+    const age = document.getElementById('exp-age').value.trim();
+    const sex = document.getElementById('exp-sex').value;
+    const cageId = document.getElementById('exp-cage-id').value;
+
+    if (!bt) { showToast('Please select a species for the purchased bird'); return; }
+    if (!cageId) { showToast('Please select a cage to add the bird to'); return; }
+    const targetCage = cages.find(c => c.id === cageId);
+    if (!targetCage) { showToast('Cage not found'); return; }
+    // Enforce same-species rule
+    if (targetCage.birds.length > 0 && targetCage.birds[0].type !== bt) {
+      showToast('That cage already contains ' + targetCage.birds[0].type + ' — choose a different cage or species');
+      return;
+    }
+
+    const newBirdId = Date.now().toString();
+    targetCage.birds.push({ id: newBirdId, type: bt, ring, age, sex, fatherId: '', motherId: '' });
+    linkedBirdId = newBirdId; linkedCageId = cageId;
+
+    const fullDesc = [cat, desc, bt, sex !== 'Unknown' ? sexEmoji(sex).trim() : '', ring ? 'Ring:'+ring : '', targetCage.name].filter(Boolean).join(' · ');
+    transactions.push({ id: (Date.now()+1).toString(), type: 'expense', cat, bt, ref: ring, amount, month, year, desc: fullDesc, linkedBirdId, linkedCageId });
+
+    document.getElementById('exp-ring').value = '';
+    document.getElementById('exp-age').value = '';
+    document.getElementById('exp-sex').value = 'Unknown';
+    document.getElementById('exp-cage-id').value = '';
+    document.getElementById('exp-amt').value = '';
+    document.getElementById('exp-desc').value = '';
+
+    save(); populateIncomeBirdDropdown(); populateExpCageDropdown();
+    renderCages(); renderSummaryPanel(); renderTransactions(); renderSummary();
+    showToast(bt + ' purchased & added to ' + targetCage.name + '!');
+
+  } else {
+    const bt = spVal('exp-sp-other');
+    const ref = document.getElementById('exp-ref').value.trim();
+    const fullDesc = [cat, desc, bt, ref?'Ref:'+ref:''].filter(Boolean).join(' · ');
+    transactions.push({ id: Date.now().toString(), type: 'expense', cat, bt, ref, amount, month, year, desc: fullDesc });
+    document.getElementById('exp-desc').value = '';
+    document.getElementById('exp-ref').value = '';
+    document.getElementById('exp-amt').value = '';
+    save(); renderTransactions(); renderSummary();
+    showToast('Expense recorded!');
+  }
+}
+
+function removeTransaction(id) {
+  const t = transactions.find(x => x.id === id);
+  if (t) {
+    // Undo cage changes when deleting a transaction
+    if (t.type === 'income' && t.linkedBirdSnap && t.linkedCageId) {
+      // Bird was sold (removed from cage) — restore it and remove from soldBirds
+      const targetCage = cages.find(c => c.id === t.linkedCageId);
+      if (targetCage) {
+        targetCage.birds.push({ id: t.linkedBirdId || Date.now().toString(), ...t.linkedBirdSnap });
+        showToast('Sale removed — bird restored to ' + targetCage.name);
+      } else {
+        showToast('Sale entry removed');
+      }
+      delete soldBirds[t.linkedBirdId];
+      renderCages(); renderSummaryPanel(); populateIncomeBirdDropdown();
+    } else if (t.type === 'expense' && t.cat === 'Bird Purchase' && t.linkedBirdId) {
+      // Bird was purchased (added to cage) — remove it
+      cages.forEach(c => { c.birds = c.birds.filter(b => b.id !== t.linkedBirdId); });
+      renderCages(); renderSummaryPanel(); populateIncomeBirdDropdown();
+      showToast('Purchase removed — bird removed from cage');
+    } else {
+      showToast('Entry removed');
+    }
+  }
+  transactions = transactions.filter(x => x.id !== id);
+  save(); renderTransactions(); renderSummary();
+}
+
+function renderTransactions() {
+  const inc=[...transactions].filter(t=>t.type==='income').reverse();
+  const exp=[...transactions].filter(t=>t.type==='expense').reverse();
+  document.getElementById('income-list').innerHTML=inc.length===0
+    ?'<p style="color:var(--muted);font-size:.8rem;font-style:italic;">No sales recorded yet</p>'
+    :inc.map(t=>`<div class="t-item income"><div class="t-l"><span class="t-desc">${esc(t.desc)}</span><span class="t-sub">${t.month} ${t.year}</span></div>
+      <div style="display:flex;align-items:center;gap:.45rem;"><span class="t-amt pos">R ${t.amount.toFixed(2)}</span>
+      <button class="btn btn-d btn-sm" onclick="removeTransaction('${t.id}')">✕</button></div></div>`).join('');
+  document.getElementById('expense-list').innerHTML=exp.length===0
+    ?'<p style="color:var(--muted);font-size:.8rem;font-style:italic;">No expenses recorded yet</p>'
+    :exp.map(t=>`<div class="t-item expense"><div class="t-l"><span class="t-desc">${esc(t.desc)}</span><span class="t-sub">${t.month} ${t.year}</span></div>
+      <div style="display:flex;align-items:center;gap:.45rem;"><span class="t-amt neg">R ${t.amount.toFixed(2)}</span>
+      <button class="btn btn-d btn-sm" onclick="removeTransaction('${t.id}')">✕</button></div></div>`).join('');
+}
+
+function renderSummary() {
+  const sel=document.getElementById('filter-yr');
+  const years=[...new Set(transactions.map(t=>t.year))].sort();
+  const cur=sel.value;
+  sel.innerHTML='<option value="all">All Years</option>'+years.map(y=>`<option value="${y}" ${y==cur?'selected':''}>${y}</option>`).join('');
+  const fy=sel.value;
+  const filt=fy==='all'?transactions:transactions.filter(t=>t.year==fy);
+  const grp={};
+  filt.forEach(t=>{const k=t.month+'|'+t.year;if(!grp[k])grp[k]={month:t.month,year:t.year,inc:0,exp:0};
+    if(t.type==='income')grp[k].inc+=t.amount;else grp[k].exp+=t.amount;});
+  const rows=Object.values(grp).sort((a,b)=>a.year!==b.year?a.year-b.year:MONTHS.indexOf(a.month)-MONTHS.indexOf(b.month));
+  document.getElementById('sum-tbody').innerHTML=rows.length===0
+    ?'<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:1.8rem;font-style:italic;">No transactions to show</td></tr>'
+    :rows.map(r=>{const n=r.inc-r.exp;return`<tr><td>${r.month}</td><td>${r.year}</td>
+      <td class="profit">R ${r.inc.toFixed(2)}</td><td class="loss">R ${r.exp.toFixed(2)}</td>
+      <td class="${n>=0?'profit':'loss'}">${n>=0?'▲':'▼'} R ${Math.abs(n).toFixed(2)} ${n>=0?'(Profit)':'(Loss)'}</td></tr>`;}).join('');
+  const ti=filt.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const te=filt.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const net=ti-te;
+  document.getElementById('g-inc').textContent='R '+ti.toFixed(2);
+  document.getElementById('g-exp').textContent='R '+te.toFixed(2);
+  const ne=document.getElementById('g-net');
+  ne.textContent=(net>=0?'▲ ':'▼ ')+'R '+Math.abs(net).toFixed(2);
+  ne.className='tot-amt '+(net>=0?'np':'nn');
+}
+
+/* ---- EXPORT / IMPORT ---- */
+function exportData() {
+  const data = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    cages,
+    transactions,
+    speciesList,
+    soldBirds
+  };
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = 'BPJ-Voels-backup-' + date + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Data exported — save the file somewhere safe!');
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.cages || !data.transactions) {
+        showToast('Invalid file — please use a BPJ Voëls backup file'); return;
+      }
+      if (!confirm('This will REPLACE all current data with the imported file. Are you sure?')) {
+        event.target.value = ''; return;
+      }
+      cages = data.cages || [];
+      transactions = data.transactions || [];
+      speciesList = data.speciesList || [...DEFAULT_SP];
+      soldBirds = data.soldBirds || {};
+      save();
+      renderSpeciesTags();
+      renderCages();
+      renderSummaryPanel();
+      populateIncomeBirdDropdown();
+      populateExpCageDropdown();
+      onExpCatChange();
+      setIncomeMode('existing');
+      // Re-render whichever tab is currently active
+      const activeTab = document.querySelector('.tab.active');
+      if (activeTab && activeTab.textContent.includes('Finance')) {
+        renderTransactions(); renderSummary();
+      }
+      if (activeTab && activeTab.textContent.includes('Family')) {
+        renderFamilyList();
+      }
+      showToast('✅ Data imported successfully!');
+    } catch(err) {
+      showToast('Could not read file — make sure it is a valid BPJ Voëls backup');
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// Global error handler — shows any JS crash on the login screen
+window.onerror = function(msg, src, line, col, err) {
+  const el = document.getElementById('js-error');
+  if (el) { el.style.display='block'; el.innerHTML = '⚠️ <strong>App error:</strong> ' + msg + (line ? ' (line ' + line + ')' : ''); }
+  return false;
+};
+
+// INIT — check if already logged in
+(async () => {
+  // Warn if opened as file://
+  if (window.location.protocol === 'file:') {
+    document.getElementById('file-warning').style.display = 'block';
+    return;
+  }
+  // Check Supabase loaded
+  if (!window.supabase) {
+    document.getElementById('cdn-error').style.display = 'block';
+    return;
+  }
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session && session.user) {
+      await launchApp(session.user);
+    }
+  } catch(e) {
+    console.warn('Session check failed:', e.message);
+  }
+  supabase.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session && !currentUser) {
+      await launchApp(session.user);
+    }
+    if (event === 'SIGNED_OUT') {
+      currentUser = null;
+      document.getElementById('app-root').style.display = 'none';
+      document.getElementById('login-screen').style.display = 'flex';
+    }
+  });
+})();
+</script>
+</body>
+</html>

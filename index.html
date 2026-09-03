@@ -566,7 +566,7 @@ input:focus,select:focus{border-color:var(--g400);}
 /* ---- SUPABASE SETUP ---- */
 const SUPA_URL = 'https://nnerqwjzledbthytqcze.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5uZXJxd2p6bGVkYnRoeXRxY3plIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNjA3NDEsImV4cCI6MjEwMzkzNjc0MX0.yu8PUkMBHzjpfxDPQoB662swXswY243Sf7Artx4x1r0';
-const supabase = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+let supabase;
 
 let currentUser = null;
 let saveTimeout = null;
@@ -1754,13 +1754,6 @@ function importData(event) {
   reader.readAsText(file);
 }
 
-// Global error handler — shows any JS crash on the login screen
-window.onerror = function(msg, src, line, col, err) {
-  const el = document.getElementById('js-error');
-  if (el) { el.style.display='block'; el.innerHTML = '⚠️ <strong>App error:</strong> ' + msg + (line ? ' (line ' + line + ')' : ''); }
-  return false;
-};
-
 // INIT — check if already logged in
 (async () => {
   // Warn if opened as file://
@@ -1773,6 +1766,8 @@ window.onerror = function(msg, src, line, col, err) {
     document.getElementById('cdn-error').style.display = 'block';
     return;
   }
+  // Create client now that CDN is confirmed loaded
+  supabase = window.supabase.createClient(SUPA_URL, SUPA_KEY);
   try {
     const { data: { session } } = await supabase.auth.getSession();
     if (session && session.user) {

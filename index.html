@@ -562,7 +562,12 @@ input:focus,select:focus{border-color:var(--g400);}
 /* ---- SUPABASE SETUP ---- */
 const SUPA_URL = 'https://nnerqwjzledbthytqcze.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5uZXJxd2p6bGVkYnRoeXRxY3plIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNjA3NDEsImV4cCI6MjEwMzkzNjc0MX0.yu8PUkMBHzjpfxDPQoB662swXswY243Sf7Artx4x1r0';
-const supabase = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+function getSupabase() {
+  if (!window._supaClient) {
+    window._supaClient = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+  }
+  return window._supaClient;
+}
 
 let currentUser = null;
 let saveTimeout = null;
@@ -578,7 +583,7 @@ async function save() {
   if (!currentUser) return;
   clearTimeout(saveTimeout);
   saveTimeout = setTimeout(async () => {
-    const { error } = await supabase.from('bpj_data').upsert({
+    const { error } = await getSupabase().from('bpj_data').upsert({
       user_id: currentUser.id,
       cages, transactions,
       species_list: speciesList,
@@ -590,7 +595,7 @@ async function save() {
 }
 
 async function loadData() {
-  const { data, error } = await supabase.from('bpj_data').select('*').eq('user_id', currentUser.id).single();
+  const { data, error } = await getSupabase().from('bpj_data').select('*').eq('user_id', currentUser.id).single();
   if (error && error.code !== 'PGRST116') { console.error('Load error:', error.message); return; }
   if (data) {
     cages = data.cages || [];
@@ -599,7 +604,7 @@ async function loadData() {
     soldBirds = data.sold_birds || {};
   } else {
     cages = []; transactions = []; speciesList = [...DEFAULT_SP]; soldBirds = {};
-    await supabase.from('bpj_data').insert({ user_id: currentUser.id, cages: [], transactions: [], species_list: speciesList, sold_birds: {} });
+    await getSupabase().from('bpj_data').insert({ user_id: currentUser.id, cages: [], transactions: [], species_list: speciesList, sold_birds: {} });
   }
 }
 
@@ -611,7 +616,7 @@ async function doLogin() {
   if (!email || !pwd) { showLoginError('Please enter your email and password.'); return; }
   btn.textContent = 'Signing in…'; btn.disabled = true;
   try {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password: pwd });
+    const { data, error } = await getSupabase().auth.signInWithPassword({ email, password: pwd });
     btn.textContent = '🔑 Sign In'; btn.disabled = false;
     if (error) {
       if (error.message.includes('Email not confirmed')) {
@@ -640,11 +645,11 @@ async function doSignup() {
   if (pwd.length < 6) { showLoginError('Password must be at least 6 characters.'); return; }
   btn.textContent = 'Creating…'; btn.disabled = true;
   try {
-    const { data, error } = await supabase.auth.signUp({ email, password: pwd });
+    const { data, error } = await getSupabase().auth.signUp({ email, password: pwd });
     btn.textContent = '✉️ Create Account'; btn.disabled = false;
     if (error) { showLoginError('Signup error: ' + error.message); return; }
     // Try to sign in immediately (works when email confirmation is disabled)
-    const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({ email, password: pwd });
+    const { data: loginData, error: loginError } = await getSupabase().auth.signInWithPassword({ email, password: pwd });
     if (!loginError && loginData.user) {
       await launchApp(loginData.user);
     } else {
@@ -659,13 +664,13 @@ async function doSignup() {
 async function doReset() {
   const email = document.getElementById('login-email').value.trim();
   if (!email) { showLoginError('Enter your email address above first.'); return; }
-  const { error } = await supabase.auth.resetPasswordForEmail(email);
+  const { error } = await getSupabase().auth.resetPasswordForEmail(email);
   if (error) { showLoginError(error.message); return; }
   showLoginMsg('Password reset email sent — check your inbox.');
 }
 
 async function doLogout() {
-  await supabase.auth.signOut();
+  await getSupabase().auth.signOut();
   currentUser = null;
   document.getElementById('app-root').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
@@ -1761,14 +1766,14 @@ function importData(event) {
     return;
   }
   try {
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session } } = await getSupabase().auth.getSession();
     if (session && session.user) {
       await launchApp(session.user);
     }
   } catch(e) {
     console.warn('Session check failed:', e.message);
   }
-  supabase.auth.onAuthStateChange(async (event, session) => {
+  getSupabase().auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_IN' && session && !currentUser) {
       await launchApp(session.user);
     }

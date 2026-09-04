@@ -1779,6 +1779,41 @@ function importData(event) {
     }
   });
 })();
+
+// Expose all functions globally for onclick HTML attributes
+window.switchTab = switchTab;
+window.toggleSpecies = toggleSpecies;
+window.addSpecies = addSpecies;
+window.removeSpecies = removeSpecies;
+window.addCage = addCage;
+window.deleteCage = deleteCage;
+window.startEditCageName = startEditCageName;
+window.saveEditCageName = saveEditCageName;
+window.cancelEditCageName = cancelEditCageName;
+window.openAddBird = openAddBird;
+window.openEditBird = openEditBird;
+window.closeModal = closeModal;
+window.saveBird = saveBird;
+window.removeBird = removeBird;
+window.onModalSpChange = onModalSpChange;
+window.onExpCatChange = onExpCatChange;
+window.onExpSpChange = onExpSpChange;
+window.onIncomeBirdChange = onIncomeBirdChange;
+window.setIncomeMode = setIncomeMode;
+window.addIncome = addIncome;
+window.addExpense = addExpense;
+window.removeTransaction = removeTransaction;
+window.renderSummary = renderSummary;
+window.renderFamilyList = renderFamilyList;
+window.selectFamilyBird = selectFamilyBird;
+window.toggleFtGroup = toggleFtGroup;
+window.exportData = exportData;
+window.importData = importData;
+window.doLogin = doLogin;
+window.doSignup = doSignup;
+window.doReset = doReset;
+window.doLogout = doLogout;
+window.populateExpCageDropdown = populateExpCageDropdown;
 </script>
 </body>
 </html>
